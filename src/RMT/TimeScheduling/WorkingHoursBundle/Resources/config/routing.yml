@@ -1,0 +1,3 @@
+rmt_time_scheduling_working_hours_homepage:
+    pattern:  /hello/{name}
+    defaults: { _controller: RMTTimeSchedulingWorkingHoursBundle:Default:index }
