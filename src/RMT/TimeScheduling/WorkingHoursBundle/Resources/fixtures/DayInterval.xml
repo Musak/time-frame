@@ -1,0 +1,11 @@
+<Fixtures>
+    <Day Namespace="RMT\TimeScheduling\Model">
+        <o1 Value="Monday" />
+        <o2 Value="Tuesday" />
+        <o3 Value="Wednesday" />
+        <o4 Value="Thursday" />
+        <o5 Value="Friday" />
+        <o6 Value="Saturday" />
+        <o7 Value="Sunday" />
+    </Day>
+</Fixtures>
