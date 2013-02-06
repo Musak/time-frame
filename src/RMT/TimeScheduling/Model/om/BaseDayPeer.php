@@ -17,7 +17,7 @@ abstract class BaseDayPeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'dbal';
+    const DATABASE_NAME = 'default';
 
     /** the table name for this class */
     const TABLE_NAME = 'day';
