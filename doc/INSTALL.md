@@ -32,3 +32,10 @@ Set apache virtual host
   CustomLog ${APACHE_LOG_DIR}/time-frame.access.log combined
 </VirtualHost>
 ```
+
+Install less
+
+```bash
+sudo apt-get intall less
+```
+

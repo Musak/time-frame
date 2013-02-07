@@ -21,7 +21,14 @@
         "kriswallsmith/assetic": "1.1.*@dev",
         "propel/propel-bundle": "1.1.*",
         "friendsofsymfony/user-bundle": "*",
-        "willdurand/propel-typehintable-behavior": "*"
+        "willdurand/propel-typehintable-behavior": "*",
+        "mopa/bootstrap-bundle": "dev-master",
+        "twitter/bootstrap": "dev-master",
+        "knplabs/knp-paginator-bundle": "dev-master",
+        "knplabs/knp-menu-bundle": "dev-master",
+        "craue/formflow-bundle": "dev-master",
+	"mopa/composer-bridge": "dev-master",
+        "knplabs/knp-menu": "dev-master"
     },
     "scripts": {
         "post-install-cmd": [
