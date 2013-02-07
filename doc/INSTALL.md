@@ -32,3 +32,11 @@ Set apache virtual host
   CustomLog ${APACHE_LOG_DIR}/time-frame.access.log combined
 </VirtualHost>
 ```
+
+Install less from the project root directory
+
+```bash
+sudo apt-get intall nodejs npm
+npm install less
+```
+
