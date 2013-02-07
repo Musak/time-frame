@@ -59,3 +59,9 @@ fos_user:
     db_driver: propel # other valid values are 'mongodb', 'couchdb' and 'propel'
     firewall_name: main
     user_class: FOS\UserBundle\Propel\User
+
+mopa_bootstrap:
+    form:
+        show_legend: false # default is true
+        show_child_legend: false # default is true
+        error_type: block # or inline which is default
