@@ -36,7 +36,7 @@ Set apache virtual host
 Install less from the project root directory
 
 ```bash
-sudo apt-get intall nodejs npm
+sudo apt-get install nodejs npm
 npm install less
 ```
 
