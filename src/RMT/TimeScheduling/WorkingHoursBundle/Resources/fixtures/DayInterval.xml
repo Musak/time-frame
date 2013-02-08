@@ -9,8 +9,9 @@
         <o7 Value="Sunday" />
     </Day>
     <DayInterval Namespace="RMT\TimeScheduling\Model">
-        <di1 DayId="o1" StartHour="7:00:00" EndHour="20:00:00" />
-        <di2 DayId="o2" StartHour="7:00:00" EndHour="20:00:00" />
-        <di3 DayId="o3" StartHour="7:00:00" EndHour="20:00:00" />
+        <di1 DayId="o1" StartHour="7:00" EndHour="20:00" />
+        <di2 DayId="o2" StartHour="7:00" EndHour="17:00" />
+        <di3 DayId="o3" StartHour="7:00" EndHour="15:00" />
+        <di4 DayId="o2" StartHour="8:00" EndHour="20:00" />
     </DayInterval>
 </Fixtures>

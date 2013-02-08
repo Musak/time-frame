@@ -5,3 +5,7 @@ rmt_time_scheduling_working_hours:
 rmt_time_scheduling_working_hours_success:
     pattern:  /working-hours-success/{id}
     defaults: { _controller: RMTTimeSchedulingWorkingHoursBundle:Default:success }
+
+rmt_time_scheduling_working_hours_list:
+    pattern:  /working-hours-list
+    defaults: { _controller: RMTTimeSchedulingWorkingHoursBundle:Default:list }

@@ -34,4 +34,12 @@ class DefaultController extends Controller
     	return $this->render('RMTTimeSchedulingWorkingHoursBundle:Default:success.html.twig',
     	    array('day_interval' => $day_interval));
     }
+
+    public function listAction()
+    {
+    	$day_intervals = DayIntervalQuery::create()->find();
+
+    	return $this->render('RMTTimeSchedulingWorkingHoursBundle:Default:list.html.twig',
+		    array('day_intervals' => $day_intervals)); 	
+    }
 }
