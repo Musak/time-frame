@@ -10,7 +10,9 @@ class DayIntervalType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('day_id');
+        $builder->add('day', 'model', array(
+            'class' => 'RMT\TimeScheduling\Model\Day',
+        ));
         $builder->add('start_hour');
         $builder->add('end_hour');
     }
