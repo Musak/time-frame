@@ -8,6 +8,6 @@ class DayInterval extends BaseDayInterval
 {
 	public function getOutput()
 	{
-		return $this->getDay()->getValue() . ' - ' . $this->getStartHour()->format('H:m');
+		return $this->getDay()->getValue() . ' - ' . $this->getStartHour()->format('H:i');
 	}
 }
