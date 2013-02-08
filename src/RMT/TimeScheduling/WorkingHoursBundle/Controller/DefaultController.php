@@ -4,6 +4,7 @@ namespace RMT\TimeScheduling\WorkingHoursBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use RMT\TimeScheduling\Model\DayInterval;
+use RMT\TimeScheduling\Model\DayIntervalQuery;
 use RMT\TimeScheduling\WorkingHoursBundle\Form\Type\DayIntervalType;
 class DefaultController extends Controller
 {
@@ -19,10 +20,18 @@ class DefaultController extends Controller
             if ($form->isValid()) {
                 $day_interval->save();
 
-                // return $this->redirect($this->generateUrl('book_success'));
+                return $this->redirect($this->generateUrl('rmt_time_scheduling_working_hours_success', array('id' => $day_interval->getId())));
             }
         }
         return $this->render('RMTTimeSchedulingWorkingHoursBundle:Default:index.html.twig',
             array('form' => $form->createView()));
+    }
+
+    public function successAction($id)
+    {
+    	$day_interval = DayIntervalQuery::create()->findPK($id);
+
+    	return $this->render('RMTTimeSchedulingWorkingHoursBundle:Default:success.html.twig',
+    	    array('day_interval' => $day_interval));
     }
 }
