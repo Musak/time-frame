@@ -8,9 +8,9 @@ use RMT\TimeScheduling\Model\DayIntervalQuery;
 use RMT\TimeScheduling\WorkingHoursBundle\Form\Type\DayIntervalType;
 class DefaultController extends Controller
 {
-    public function indexAction()
+    public function indexAction($id)
     {
-    	$day_interval = new DayInterval();
+    	$day_interval = DayIntervalQuery::create()->filterById($id)->findOneOrCreate();
     	$form = $this->createForm(new DayIntervalType(), $day_interval);
         $request = $this->getRequest();
 
@@ -42,4 +42,5 @@ class DefaultController extends Controller
     	return $this->render('RMTTimeSchedulingWorkingHoursBundle:Default:list.html.twig',
 		    array('day_intervals' => $day_intervals)); 	
     }
+
 }
