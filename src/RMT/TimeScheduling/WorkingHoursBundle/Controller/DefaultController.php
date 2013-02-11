@@ -8,23 +8,12 @@ use RMT\TimeScheduling\Model\DayIntervalQuery;
 use RMT\TimeScheduling\WorkingHoursBundle\Form\Type\DayIntervalType;
 class DefaultController extends Controller
 {
-    public function indexAction($id)
+    public function indexAction()
     {
-    	$day_interval = DayIntervalQuery::create()->filterById($id)->findOneOrCreate();
-    	$form = $this->createForm(new DayIntervalType(), $day_interval);
-        $request = $this->getRequest();
+    	$day_intervals = DayIntervalQuery::create()->find();
 
-        if ('POST' === $request->getMethod()) {
-            $form->bindRequest($request);
-
-            if ($form->isValid()) {
-                $day_interval->save();
-
-                return $this->redirect($this->generateUrl('rmt_time_scheduling_working_hours_success', array('id' => $day_interval->getId())));
-            }
-        }
         return $this->render('RMTTimeSchedulingWorkingHoursBundle:Default:index.html.twig',
-            array('form' => $form->createView()));
+            array('day_intervals' => $day_intervals));
     }
 
     public function successAction($id)
@@ -35,12 +24,25 @@ class DefaultController extends Controller
     	    array('day_interval' => $day_interval));
     }
 
-    public function listAction()
+    public function editAction($id)
     {
-    	$day_intervals = DayIntervalQuery::create()->find();
+        $day_interval = DayIntervalQuery::create()->filterById($id)->findOneOrCreate();
+        $form = $this->createForm(new DayIntervalType(), $day_interval);
+        $request = $this->getRequest();
 
-    	return $this->render('RMTTimeSchedulingWorkingHoursBundle:Default:list.html.twig',
-		    array('day_intervals' => $day_intervals)); 	
+        if ('POST' === $request->getMethod()) {
+            $form->bindRequest($request);
+
+            if ($form->isValid()) {
+                $day_interval->save();
+
+                return $this->redirect($this->generateUrl(
+                    'rmt_time_scheduling_working_hours_success',
+                    array('id' => $day_interval->getId())));
+            }
+        }
+        return $this->render('RMTTimeSchedulingWorkingHoursBundle:Default:edit.html.twig',
+            array('form' => $form->createView()));
     }
 
 }

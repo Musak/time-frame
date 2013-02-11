@@ -1,3 +1,0 @@
-{% for day_interval in day_intervals %}
-	{{ day_interval.output }} <a href="{{ path('rmt_time_scheduling_working_hours', {'id': day_interval.id} ) }}">edit</a><br />
-{% endfor %}
