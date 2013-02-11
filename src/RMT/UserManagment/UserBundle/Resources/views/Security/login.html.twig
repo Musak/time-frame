@@ -2,12 +2,12 @@
 {% block headline %}{{ parent() }} - Login{% endblock headline %}
 
 {% block fos_user_content %}
-<div class="span2 offset5">
+<div class="span12">
     {% if error %}
         <div class="alert alert-error alert-block fade in">{{ error|trans({}, 'FOSUserBundle') }}</div>
     {% endif %}
 
-    <form action="{{ path("fos_user_security_check") }}" method="post" >
+    <form action="{{ path("fos_user_security_check") }}" class="user_form" method="post" >
         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
 
         <label for="username">{{ 'security.login.username'|trans({}, 'FOSUserBundle') }}</label>
