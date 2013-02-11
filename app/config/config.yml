@@ -4,7 +4,7 @@ imports:
 
 framework:
     #esi:             ~
-    #translator:      { fallback: "%locale%" }
+    translator:      { fallback: "%locale%" }
     secret:          "%secret%"
     router:
         resource: "%kernel.root_dir%/config/routing.yml"
@@ -27,7 +27,7 @@ twig:
 assetic:
     debug:          "%kernel.debug%"
     use_controller: false
-    bundles:        [MopaBootstrapBundle]
+    bundles:        [MopaBootstrapBundle, FOSUserBundle]
     #java: /usr/bin/java
     filters:
         less:
@@ -63,6 +63,13 @@ fos_user:
     db_driver: propel # other valid values are 'mongodb', 'couchdb' and 'propel'
     firewall_name: main
     user_class: FOS\UserBundle\Propel\User
+    from_email:
+        address:        noreply@time-frame.com
+        sender_name:   Time-Frame
+
+    registration:
+        confirmation:
+            enabled:    true
 
 mopa_bootstrap:
     navbar: {}

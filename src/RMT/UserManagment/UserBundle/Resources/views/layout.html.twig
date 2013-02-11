@@ -1,0 +1,49 @@
+{% extends 'MopaBootstrapBundle::layout.html.twig' %}
+
+{% block head_style %}
+    {{ parent() }}
+    {# Override this block to add your own files! #}
+    {% stylesheets
+        '@RMTUserManagmentUserBundle/Resources/public/css/user_managment.css'
+    %}
+    <link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen" />
+    {% endstylesheets %}
+    {# To use this without less use the base_css.html.twig template as your base
+     # Be sure you understand whats going on: have a look into
+     # https://github.com/phiamo/MopaBootstrapBundle/blob/master/Resources/doc/css-vs-less.md
+     #}
+{% endblock head_style %}
+
+ {% block content %}
+    {% block fos_user_content %}{% endblock fos_user_content %}
+ {% endblock content %}
+
+{#<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+    </head>
+    <body>
+        <div>
+            {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                {{ 'layout.logged_in_as'|trans({'%username%': app.user.username}, 'FOSUserBundle') }} |
+                <a href="{{ path('fos_user_security_logout') }}">
+                    {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
+                </a>
+            {% else %}
+                <a href="{{ path('fos_user_security_login') }}">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}</a>
+            {% endif %}
+        </div>
+
+        {% for key, message in app.session.getFlashes() %}
+        <div class="{{ key }}">
+            {{ message|trans({}, 'FOSUserBundle') }}
+        </div>
+        {% endfor %}
+
+        <div>
+            {% block fos_user_content %}
+            {% endblock fos_user_content %}
+        </div>
+    </body>
+</html>#}
