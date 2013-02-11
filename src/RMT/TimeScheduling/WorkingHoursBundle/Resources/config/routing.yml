@@ -2,10 +2,6 @@ rmt_time_scheduling_working_hours:
     pattern:  /working-hours
     defaults: { _controller: RMTTimeSchedulingWorkingHoursBundle:Default:index }
 
-rmt_time_scheduling_working_hours_success:
-    pattern:  /working-hours-success/{id}
-    defaults: { _controller: RMTTimeSchedulingWorkingHoursBundle:Default:success }
-
 rmt_time_scheduling_working_hours_edit:
     pattern:  /working-hours-edit/{id}
     defaults: { _controller: RMTTimeSchedulingWorkingHoursBundle:Default:edit, id: null }

@@ -21,14 +21,6 @@ class DefaultController extends Controller
             array('day_intervals' => $day_intervals));
     }
 
-    public function successAction($id)
-    {
-    	$day_interval = DayIntervalQuery::create()->findPK($id);
-
-    	return $this->render('RMTTimeSchedulingWorkingHoursBundle:Default:success.html.twig',
-    	    array('day_interval' => $day_interval));
-    }
-
     public function editAction($id)
     {
         $user = $this->getUser();
@@ -46,9 +38,7 @@ class DefaultController extends Controller
                 $day_interval->setUser($user);
                 $day_interval->save();
 
-                return $this->redirect($this->generateUrl(
-                    'rmt_time_scheduling_working_hours_success',
-                    array('id' => $day_interval->getId())));
+                return $this->redirect($this->generateUrl('rmt_time_scheduling_working_hours'));
             }
         }
         return $this->render('RMTTimeSchedulingWorkingHoursBundle:Default:edit.html.twig',
