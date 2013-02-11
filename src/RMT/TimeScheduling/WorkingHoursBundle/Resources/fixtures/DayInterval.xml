@@ -1,4 +1,5 @@
 <Fixtures>
+    <!-- Add one user to the fixtures, related to the day_interval table -->
     <Day Namespace="RMT\TimeScheduling\Model">
         <o1 Value="Monday" />
         <o2 Value="Tuesday" />

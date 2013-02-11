@@ -43,6 +43,7 @@ class DayIntervalTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('USER_ID', 'UserId', 'INTEGER', 'fos_user', 'ID', true, null, null);
         $this->addForeignKey('DAY_ID', 'DayId', 'INTEGER', 'day', 'ID', false, null, null);
         $this->addColumn('START_HOUR', 'StartHour', 'TIME', false, null, null);
         $this->addColumn('END_HOUR', 'EndHour', 'TIME', false, null, null);
@@ -54,6 +55,7 @@ class DayIntervalTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('User', 'FOS\\UserBundle\\Propel\\User', RelationMap::MANY_TO_ONE, array('user_id' => 'id', ), null, null);
         $this->addRelation('Day', 'RMT\\TimeScheduling\\Model\\Day', RelationMap::MANY_TO_ONE, array('day_id' => 'id', ), null, null);
     } // buildRelations()
 

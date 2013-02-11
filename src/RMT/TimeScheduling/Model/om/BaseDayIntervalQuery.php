@@ -12,6 +12,7 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use FOS\UserBundle\Propel\User;
 use RMT\TimeScheduling\Model\Day;
 use RMT\TimeScheduling\Model\DayInterval;
 use RMT\TimeScheduling\Model\DayIntervalPeer;
@@ -19,11 +20,13 @@ use RMT\TimeScheduling\Model\DayIntervalQuery;
 
 /**
  * @method DayIntervalQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method DayIntervalQuery orderByUserId($order = Criteria::ASC) Order by the user_id column
  * @method DayIntervalQuery orderByDayId($order = Criteria::ASC) Order by the day_id column
  * @method DayIntervalQuery orderByStartHour($order = Criteria::ASC) Order by the start_hour column
  * @method DayIntervalQuery orderByEndHour($order = Criteria::ASC) Order by the end_hour column
  *
  * @method DayIntervalQuery groupById() Group by the id column
+ * @method DayIntervalQuery groupByUserId() Group by the user_id column
  * @method DayIntervalQuery groupByDayId() Group by the day_id column
  * @method DayIntervalQuery groupByStartHour() Group by the start_hour column
  * @method DayIntervalQuery groupByEndHour() Group by the end_hour column
@@ -31,6 +34,10 @@ use RMT\TimeScheduling\Model\DayIntervalQuery;
  * @method DayIntervalQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method DayIntervalQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method DayIntervalQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ *
+ * @method DayIntervalQuery leftJoinUser($relationAlias = null) Adds a LEFT JOIN clause to the query using the User relation
+ * @method DayIntervalQuery rightJoinUser($relationAlias = null) Adds a RIGHT JOIN clause to the query using the User relation
+ * @method DayIntervalQuery innerJoinUser($relationAlias = null) Adds a INNER JOIN clause to the query using the User relation
  *
  * @method DayIntervalQuery leftJoinDay($relationAlias = null) Adds a LEFT JOIN clause to the query using the Day relation
  * @method DayIntervalQuery rightJoinDay($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Day relation
@@ -40,11 +47,13 @@ use RMT\TimeScheduling\Model\DayIntervalQuery;
  * @method DayInterval findOneOrCreate(PropelPDO $con = null) Return the first DayInterval matching the query, or a new DayInterval object populated from the query conditions when no match is found
  *
  * @method DayInterval findOneById(int $id) Return the first DayInterval filtered by the id column
+ * @method DayInterval findOneByUserId(int $user_id) Return the first DayInterval filtered by the user_id column
  * @method DayInterval findOneByDayId(int $day_id) Return the first DayInterval filtered by the day_id column
  * @method DayInterval findOneByStartHour(string $start_hour) Return the first DayInterval filtered by the start_hour column
  * @method DayInterval findOneByEndHour(string $end_hour) Return the first DayInterval filtered by the end_hour column
  *
  * @method array findById(int $id) Return DayInterval objects filtered by the id column
+ * @method array findByUserId(int $user_id) Return DayInterval objects filtered by the user_id column
  * @method array findByDayId(int $day_id) Return DayInterval objects filtered by the day_id column
  * @method array findByStartHour(string $start_hour) Return DayInterval objects filtered by the start_hour column
  * @method array findByEndHour(string $end_hour) Return DayInterval objects filtered by the end_hour column
@@ -135,7 +144,7 @@ abstract class BaseDayIntervalQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `DAY_ID`, `START_HOUR`, `END_HOUR` FROM `day_interval` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `USER_ID`, `DAY_ID`, `START_HOUR`, `END_HOUR` FROM `day_interval` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -249,6 +258,49 @@ abstract class BaseDayIntervalQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(DayIntervalPeer::ID, $id, $comparison);
+    }
+
+    /**
+     * Filter the query on the user_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUserId(1234); // WHERE user_id = 1234
+     * $query->filterByUserId(array(12, 34)); // WHERE user_id IN (12, 34)
+     * $query->filterByUserId(array('min' => 12)); // WHERE user_id > 12
+     * </code>
+     *
+     * @see       filterByUser()
+     *
+     * @param     mixed $userId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return DayIntervalQuery The current query, for fluid interface
+     */
+    public function filterByUserId($userId = null, $comparison = null)
+    {
+        if (is_array($userId)) {
+            $useMinMax = false;
+            if (isset($userId['min'])) {
+                $this->addUsingAlias(DayIntervalPeer::USER_ID, $userId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($userId['max'])) {
+                $this->addUsingAlias(DayIntervalPeer::USER_ID, $userId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(DayIntervalPeer::USER_ID, $userId, $comparison);
     }
 
     /**
@@ -378,6 +430,82 @@ abstract class BaseDayIntervalQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(DayIntervalPeer::END_HOUR, $endHour, $comparison);
+    }
+
+    /**
+     * Filter the query by a related User object
+     *
+     * @param   User|PropelObjectCollection $user The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   DayIntervalQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByUser($user, $comparison = null)
+    {
+        if ($user instanceof User) {
+            return $this
+                ->addUsingAlias(DayIntervalPeer::USER_ID, $user->getId(), $comparison);
+        } elseif ($user instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(DayIntervalPeer::USER_ID, $user->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByUser() only accepts arguments of type User or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the User relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return DayIntervalQuery The current query, for fluid interface
+     */
+    public function joinUser($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('User');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'User');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the User relation User object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \FOS\UserBundle\Propel\UserQuery A secondary query class using the current class as primary query
+     */
+    public function useUserQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinUser($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'User', '\FOS\UserBundle\Propel\UserQuery');
     }
 
     /**

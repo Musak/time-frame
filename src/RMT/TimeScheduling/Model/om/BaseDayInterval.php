@@ -13,6 +13,8 @@ use \Propel;
 use \PropelDateTime;
 use \PropelException;
 use \PropelPDO;
+use FOS\UserBundle\Propel\User;
+use FOS\UserBundle\Propel\UserQuery;
 use RMT\TimeScheduling\Model\Day;
 use RMT\TimeScheduling\Model\DayInterval;
 use RMT\TimeScheduling\Model\DayIntervalPeer;
@@ -47,6 +49,12 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
     protected $id;
 
     /**
+     * The value for the user_id field.
+     * @var        int
+     */
+    protected $user_id;
+
+    /**
      * The value for the day_id field.
      * @var        int
      */
@@ -63,6 +71,11 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
      * @var        string
      */
     protected $end_hour;
+
+    /**
+     * @var        User
+     */
+    protected $aUser;
 
     /**
      * @var        Day
@@ -91,6 +104,16 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Get the [user_id] column value.
+     *
+     * @return int
+     */
+    public function getUserId()
+    {
+        return $this->user_id;
     }
 
     /**
@@ -187,6 +210,31 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
 
         return $this;
     } // setId()
+
+    /**
+     * Set the value of [user_id] column.
+     *
+     * @param int $v new value
+     * @return DayInterval The current object (for fluent API support)
+     */
+    public function setUserId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->user_id !== $v) {
+            $this->user_id = $v;
+            $this->modifiedColumns[] = DayIntervalPeer::USER_ID;
+        }
+
+        if ($this->aUser !== null && $this->aUser->getId() !== $v) {
+            $this->aUser = null;
+        }
+
+
+        return $this;
+    } // setUserId()
 
     /**
      * Set the value of [day_id] column.
@@ -292,9 +340,10 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
         try {
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->day_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->start_hour = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->end_hour = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->user_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->day_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->start_hour = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->end_hour = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -303,7 +352,7 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = DayIntervalPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = DayIntervalPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating DayInterval object", $e);
@@ -326,6 +375,9 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aUser !== null && $this->user_id !== $this->aUser->getId()) {
+            $this->aUser = null;
+        }
         if ($this->aDay !== null && $this->day_id !== $this->aDay->getId()) {
             $this->aDay = null;
         }
@@ -368,6 +420,7 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aUser = null;
             $this->aDay = null;
         } // if (deep)
     }
@@ -487,6 +540,13 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
+            if ($this->aUser !== null) {
+                if ($this->aUser->isModified() || $this->aUser->isNew()) {
+                    $affectedRows += $this->aUser->save($con);
+                }
+                $this->setUser($this->aUser);
+            }
+
             if ($this->aDay !== null) {
                 if ($this->aDay->isModified() || $this->aDay->isNew()) {
                     $affectedRows += $this->aDay->save($con);
@@ -534,6 +594,9 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
         if ($this->isColumnModified(DayIntervalPeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '`ID`';
         }
+        if ($this->isColumnModified(DayIntervalPeer::USER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`USER_ID`';
+        }
         if ($this->isColumnModified(DayIntervalPeer::DAY_ID)) {
             $modifiedColumns[':p' . $index++]  = '`DAY_ID`';
         }
@@ -556,6 +619,9 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
                 switch ($columnName) {
                     case '`ID`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
+                    case '`USER_ID`':
+                        $stmt->bindValue($identifier, $this->user_id, PDO::PARAM_INT);
                         break;
                     case '`DAY_ID`':
                         $stmt->bindValue($identifier, $this->day_id, PDO::PARAM_INT);
@@ -665,6 +731,12 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
+            if ($this->aUser !== null) {
+                if (!$this->aUser->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aUser->getValidationFailures());
+                }
+            }
+
             if ($this->aDay !== null) {
                 if (!$this->aDay->validate($columns)) {
                     $failureMap = array_merge($failureMap, $this->aDay->getValidationFailures());
@@ -716,12 +788,15 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
                 return $this->getId();
                 break;
             case 1:
-                return $this->getDayId();
+                return $this->getUserId();
                 break;
             case 2:
-                return $this->getStartHour();
+                return $this->getDayId();
                 break;
             case 3:
+                return $this->getStartHour();
+                break;
+            case 4:
                 return $this->getEndHour();
                 break;
             default:
@@ -754,11 +829,15 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
         $keys = DayIntervalPeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getDayId(),
-            $keys[2] => $this->getStartHour(),
-            $keys[3] => $this->getEndHour(),
+            $keys[1] => $this->getUserId(),
+            $keys[2] => $this->getDayId(),
+            $keys[3] => $this->getStartHour(),
+            $keys[4] => $this->getEndHour(),
         );
         if ($includeForeignObjects) {
+            if (null !== $this->aUser) {
+                $result['User'] = $this->aUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
             if (null !== $this->aDay) {
                 $result['Day'] = $this->aDay->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
@@ -800,12 +879,15 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
                 $this->setId($value);
                 break;
             case 1:
-                $this->setDayId($value);
+                $this->setUserId($value);
                 break;
             case 2:
-                $this->setStartHour($value);
+                $this->setDayId($value);
                 break;
             case 3:
+                $this->setStartHour($value);
+                break;
+            case 4:
                 $this->setEndHour($value);
                 break;
         } // switch()
@@ -833,9 +915,10 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
         $keys = DayIntervalPeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setDayId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setStartHour($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setEndHour($arr[$keys[3]]);
+        if (array_key_exists($keys[1], $arr)) $this->setUserId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setDayId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setStartHour($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setEndHour($arr[$keys[4]]);
     }
 
     /**
@@ -848,6 +931,7 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
         $criteria = new Criteria(DayIntervalPeer::DATABASE_NAME);
 
         if ($this->isColumnModified(DayIntervalPeer::ID)) $criteria->add(DayIntervalPeer::ID, $this->id);
+        if ($this->isColumnModified(DayIntervalPeer::USER_ID)) $criteria->add(DayIntervalPeer::USER_ID, $this->user_id);
         if ($this->isColumnModified(DayIntervalPeer::DAY_ID)) $criteria->add(DayIntervalPeer::DAY_ID, $this->day_id);
         if ($this->isColumnModified(DayIntervalPeer::START_HOUR)) $criteria->add(DayIntervalPeer::START_HOUR, $this->start_hour);
         if ($this->isColumnModified(DayIntervalPeer::END_HOUR)) $criteria->add(DayIntervalPeer::END_HOUR, $this->end_hour);
@@ -914,6 +998,7 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setUserId($this->getUserId());
         $copyObj->setDayId($this->getDayId());
         $copyObj->setStartHour($this->getStartHour());
         $copyObj->setEndHour($this->getEndHour());
@@ -976,6 +1061,57 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
     }
 
     /**
+     * Declares an association between this object and a User object.
+     *
+     * @param             User $v
+     * @return DayInterval The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setUser(User $v = null)
+    {
+        if ($v === null) {
+            $this->setUserId(NULL);
+        } else {
+            $this->setUserId($v->getId());
+        }
+
+        $this->aUser = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the User object, it will not be re-added.
+        if ($v !== null) {
+            $v->addDayInterval($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated User object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return User The associated User object.
+     * @throws PropelException
+     */
+    public function getUser(PropelPDO $con = null)
+    {
+        if ($this->aUser === null && ($this->user_id !== null)) {
+            $this->aUser = UserQuery::create()->findPk($this->user_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aUser->addDayIntervals($this);
+             */
+        }
+
+        return $this->aUser;
+    }
+
+    /**
      * Declares an association between this object and a Day object.
      *
      * @param             Day $v
@@ -1032,6 +1168,7 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
     public function clear()
     {
         $this->id = null;
+        $this->user_id = null;
         $this->day_id = null;
         $this->start_hour = null;
         $this->end_hour = null;
@@ -1057,6 +1194,7 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
         if ($deep) {
         } // if ($deep)
 
+        $this->aUser = null;
         $this->aDay = null;
     }
 

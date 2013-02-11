@@ -9,6 +9,7 @@ use \PDOStatement;
 use \Propel;
 use \PropelException;
 use \PropelPDO;
+use FOS\UserBundle\Propel\UserPeer;
 use RMT\TimeScheduling\Model\DayInterval;
 use RMT\TimeScheduling\Model\DayIntervalPeer;
 use RMT\TimeScheduling\Model\DayPeer;
@@ -30,16 +31,19 @@ abstract class BaseDayIntervalPeer
     const TM_CLASS = 'DayIntervalTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 5;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /** the column name for the ID field */
     const ID = 'day_interval.ID';
+
+    /** the column name for the USER_ID field */
+    const USER_ID = 'day_interval.USER_ID';
 
     /** the column name for the DAY_ID field */
     const DAY_ID = 'day_interval.DAY_ID';
@@ -69,12 +73,12 @@ abstract class BaseDayIntervalPeer
      * e.g. DayIntervalPeer::$fieldNames[DayIntervalPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'DayId', 'StartHour', 'EndHour', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'dayId', 'startHour', 'endHour', ),
-        BasePeer::TYPE_COLNAME => array (DayIntervalPeer::ID, DayIntervalPeer::DAY_ID, DayIntervalPeer::START_HOUR, DayIntervalPeer::END_HOUR, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'DAY_ID', 'START_HOUR', 'END_HOUR', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'day_id', 'start_hour', 'end_hour', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'UserId', 'DayId', 'StartHour', 'EndHour', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'userId', 'dayId', 'startHour', 'endHour', ),
+        BasePeer::TYPE_COLNAME => array (DayIntervalPeer::ID, DayIntervalPeer::USER_ID, DayIntervalPeer::DAY_ID, DayIntervalPeer::START_HOUR, DayIntervalPeer::END_HOUR, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'USER_ID', 'DAY_ID', 'START_HOUR', 'END_HOUR', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'user_id', 'day_id', 'start_hour', 'end_hour', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -84,12 +88,12 @@ abstract class BaseDayIntervalPeer
      * e.g. DayIntervalPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'DayId' => 1, 'StartHour' => 2, 'EndHour' => 3, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'dayId' => 1, 'startHour' => 2, 'endHour' => 3, ),
-        BasePeer::TYPE_COLNAME => array (DayIntervalPeer::ID => 0, DayIntervalPeer::DAY_ID => 1, DayIntervalPeer::START_HOUR => 2, DayIntervalPeer::END_HOUR => 3, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'DAY_ID' => 1, 'START_HOUR' => 2, 'END_HOUR' => 3, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'day_id' => 1, 'start_hour' => 2, 'end_hour' => 3, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'UserId' => 1, 'DayId' => 2, 'StartHour' => 3, 'EndHour' => 4, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'userId' => 1, 'dayId' => 2, 'startHour' => 3, 'endHour' => 4, ),
+        BasePeer::TYPE_COLNAME => array (DayIntervalPeer::ID => 0, DayIntervalPeer::USER_ID => 1, DayIntervalPeer::DAY_ID => 2, DayIntervalPeer::START_HOUR => 3, DayIntervalPeer::END_HOUR => 4, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'USER_ID' => 1, 'DAY_ID' => 2, 'START_HOUR' => 3, 'END_HOUR' => 4, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'user_id' => 1, 'day_id' => 2, 'start_hour' => 3, 'end_hour' => 4, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -164,11 +168,13 @@ abstract class BaseDayIntervalPeer
     {
         if (null === $alias) {
             $criteria->addSelectColumn(DayIntervalPeer::ID);
+            $criteria->addSelectColumn(DayIntervalPeer::USER_ID);
             $criteria->addSelectColumn(DayIntervalPeer::DAY_ID);
             $criteria->addSelectColumn(DayIntervalPeer::START_HOUR);
             $criteria->addSelectColumn(DayIntervalPeer::END_HOUR);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
+            $criteria->addSelectColumn($alias . '.USER_ID');
             $criteria->addSelectColumn($alias . '.DAY_ID');
             $criteria->addSelectColumn($alias . '.START_HOUR');
             $criteria->addSelectColumn($alias . '.END_HOUR');
@@ -469,6 +475,57 @@ abstract class BaseDayIntervalPeer
 
 
     /**
+     * Returns the number of rows matching criteria, joining the related User table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinUser(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(DayIntervalPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            DayIntervalPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(DayIntervalPeer::USER_ID, UserPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
      * Returns the number of rows matching criteria, joining the related Day table
      *
      * @param      Criteria $criteria
@@ -516,6 +573,73 @@ abstract class BaseDayIntervalPeer
         $stmt->closeCursor();
 
         return $count;
+    }
+
+
+    /**
+     * Selects a collection of DayInterval objects pre-filled with their User objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of DayInterval objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinUser(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+        }
+
+        DayIntervalPeer::addSelectColumns($criteria);
+        $startcol = DayIntervalPeer::NUM_HYDRATE_COLUMNS;
+        UserPeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(DayIntervalPeer::USER_ID, UserPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = DayIntervalPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = DayIntervalPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = DayIntervalPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                DayIntervalPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = UserPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = UserPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = UserPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    UserPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (DayInterval) to $obj2 (User)
+                $obj2->addDayInterval($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
     }
 
 
@@ -622,6 +746,8 @@ abstract class BaseDayIntervalPeer
             $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
+        $criteria->addJoin(DayIntervalPeer::USER_ID, UserPeer::ID, $join_behavior);
+
         $criteria->addJoin(DayIntervalPeer::DAY_ID, DayPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
@@ -658,8 +784,13 @@ abstract class BaseDayIntervalPeer
         DayIntervalPeer::addSelectColumns($criteria);
         $startcol2 = DayIntervalPeer::NUM_HYDRATE_COLUMNS;
 
+        UserPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + UserPeer::NUM_HYDRATE_COLUMNS;
+
         DayPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + DayPeer::NUM_HYDRATE_COLUMNS;
+        $startcol4 = $startcol3 + DayPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(DayIntervalPeer::USER_ID, UserPeer::ID, $join_behavior);
 
         $criteria->addJoin(DayIntervalPeer::DAY_ID, DayPeer::ID, $join_behavior);
 
@@ -680,23 +811,291 @@ abstract class BaseDayIntervalPeer
                 DayIntervalPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-            // Add objects for joined Day rows
+            // Add objects for joined User rows
 
-            $key2 = DayPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            $key2 = UserPeer::getPrimaryKeyHashFromRow($row, $startcol2);
             if ($key2 !== null) {
-                $obj2 = DayPeer::getInstanceFromPool($key2);
+                $obj2 = UserPeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
+                    $cls = UserPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    UserPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 loaded
+
+                // Add the $obj1 (DayInterval) to the collection in $obj2 (User)
+                $obj2->addDayInterval($obj1);
+            } // if joined row not null
+
+            // Add objects for joined Day rows
+
+            $key3 = DayPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+            if ($key3 !== null) {
+                $obj3 = DayPeer::getInstanceFromPool($key3);
+                if (!$obj3) {
+
                     $cls = DayPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    DayPeer::addInstanceToPool($obj3, $key3);
+                } // if obj3 loaded
+
+                // Add the $obj1 (DayInterval) to the collection in $obj3 (Day)
+                $obj3->addDayInterval($obj1);
+            } // if joined row not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related User table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptUser(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(DayIntervalPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            DayIntervalPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(DayIntervalPeer::DAY_ID, DayPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Day table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptDay(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(DayIntervalPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            DayIntervalPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(DayIntervalPeer::USER_ID, UserPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Selects a collection of DayInterval objects pre-filled with all related objects except User.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of DayInterval objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptUser(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+        }
+
+        DayIntervalPeer::addSelectColumns($criteria);
+        $startcol2 = DayIntervalPeer::NUM_HYDRATE_COLUMNS;
+
+        DayPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + DayPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(DayIntervalPeer::DAY_ID, DayPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = DayIntervalPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = DayIntervalPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = DayIntervalPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                DayIntervalPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Day rows
+
+                $key2 = DayPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = DayPeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = DayPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol2);
                     DayPeer::addInstanceToPool($obj2, $key2);
-                } // if obj2 loaded
+                } // if $obj2 already loaded
 
                 // Add the $obj1 (DayInterval) to the collection in $obj2 (Day)
                 $obj2->addDayInterval($obj1);
-            } // if joined row not null
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of DayInterval objects pre-filled with all related objects except Day.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of DayInterval objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptDay(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+        }
+
+        DayIntervalPeer::addSelectColumns($criteria);
+        $startcol2 = DayIntervalPeer::NUM_HYDRATE_COLUMNS;
+
+        UserPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + UserPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(DayIntervalPeer::USER_ID, UserPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = DayIntervalPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = DayIntervalPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = DayIntervalPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                DayIntervalPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined User rows
+
+                $key2 = UserPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = UserPeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = UserPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    UserPeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (DayInterval) to the collection in $obj2 (User)
+                $obj2->addDayInterval($obj1);
+
+            } // if joined row is not null
 
             $results[] = $obj1;
         }

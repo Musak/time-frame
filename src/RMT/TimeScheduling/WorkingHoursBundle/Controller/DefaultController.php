@@ -9,11 +9,13 @@ use RMT\TimeScheduling\Model\DayInterval;
 use RMT\TimeScheduling\Model\DayIntervalQuery;
 use RMT\TimeScheduling\WorkingHoursBundle\Form\Type\DayIntervalType;
 
+// @todo add security filters for user on actions
 class DefaultController extends Controller
 {
     public function indexAction()
     {
-    	$day_intervals = DayIntervalQuery::create()->find();
+        $user = $this->getUser();
+    	$day_intervals = DayIntervalQuery::create()->filterByUser($user)->find();
 
         return $this->render('RMTTimeSchedulingWorkingHoursBundle:Default:index.html.twig',
             array('day_intervals' => $day_intervals));
@@ -29,7 +31,11 @@ class DefaultController extends Controller
 
     public function editAction($id)
     {
-        $day_interval = DayIntervalQuery::create()->filterById($id)->findOneOrCreate();
+        $user = $this->getUser();
+        $day_interval = DayIntervalQuery::create()
+            ->filterByUser($user)
+            ->filterById($id)
+            ->findOneOrCreate();
         $form = $this->createForm(new DayIntervalType(), $day_interval);
         $request = $this->getRequest();
 
@@ -37,6 +43,7 @@ class DefaultController extends Controller
             $form->bindRequest($request);
 
             if ($form->isValid()) {
+                $day_interval->setUser($user);
                 $day_interval->save();
 
                 return $this->redirect($this->generateUrl(
