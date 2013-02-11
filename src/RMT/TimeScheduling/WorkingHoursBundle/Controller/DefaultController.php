@@ -3,9 +3,12 @@
 namespace RMT\TimeScheduling\WorkingHoursBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+
 use RMT\TimeScheduling\Model\DayInterval;
 use RMT\TimeScheduling\Model\DayIntervalQuery;
 use RMT\TimeScheduling\WorkingHoursBundle\Form\Type\DayIntervalType;
+
 class DefaultController extends Controller
 {
     public function indexAction()
@@ -43,6 +46,14 @@ class DefaultController extends Controller
         }
         return $this->render('RMTTimeSchedulingWorkingHoursBundle:Default:edit.html.twig',
             array('form' => $form->createView()));
+    }
+
+    // @todo access control
+    public function deleteAction($id)
+    {
+        DayIntervalQuery::create()->filterById($id)->delete();
+        $referer = $this->getRequest()->headers->get('referer');
+        return new RedirectResponse($referer);
     }
 
 }

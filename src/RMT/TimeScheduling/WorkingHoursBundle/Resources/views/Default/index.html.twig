@@ -2,7 +2,10 @@
 
 {% block working_hours %}
 {% for day_interval in day_intervals %}
-	{{ day_interval.output }} <a href="{{ path('rmt_time_scheduling_working_hours_edit', {'id': day_interval.id} ) }}">edit</a><br />
+	{{ day_interval.output }}
+	<a href="{{ path('rmt_time_scheduling_working_hours_edit', {'id': day_interval.id} ) }}">Edit</a>
+	<a href="{{ path('rmt_time_scheduling_working_hours_delete', {'id': day_interval.id}) }}">Delete</a>
+	<br />
 {% endfor %}
 <a href="{{ path('rmt_time_scheduling_working_hours_edit') }}">New</a>
 {% endblock %}
