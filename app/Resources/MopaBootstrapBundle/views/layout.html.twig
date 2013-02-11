@@ -1,7 +1,25 @@
 {% extends 'MopaBootstrapBundle::base.html.twig' %}
 
-{% block headline %}Time Frame{% endblock headline %}
-
 {% block title %}Yourapp{% endblock %}
 {% block navbar %}{% endblock navbar %}
+
+{% block page_header %}
+            <div class="page-header">
+                <div class="row-fluid">
+                    <div class="span11">
+                      <h1>{% block headline %}Time Frame{% endblock headline %}</h1>
+                    </div>
+                    <div class="span1">
+                        {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                              {{ 'layout.logged_in_as'|trans({'%username%': app.user.username}, 'FOSUserBundle') }} |
+                              <a href="{{ path('fos_user_security_logout') }}">
+                                  {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
+                              </a>
+                         {% else %}
+                              <a href="{{ path('fos_user_security_login') }}">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}</a>
+                         {% endif %}
+                    </div>
+                 </div>
+            </div>
+{% endblock page_header %}
 
