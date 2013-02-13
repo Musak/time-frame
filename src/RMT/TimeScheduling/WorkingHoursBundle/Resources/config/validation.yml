@@ -1,0 +1,5 @@
+RMT\TimeScheduling\Model\DayInterval:
+    constraints:
+        - Callback:
+            methods:
+                -    [RMT\TimeScheduling\DayIntervalValidator, isValidInterval]
