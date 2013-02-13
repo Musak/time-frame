@@ -1,0 +1,11 @@
+rmt_time_scheduling_working_hours:
+    pattern:  /working-hours
+    defaults: { _controller: RMTTimeSchedulingWorkingHoursBundle:Default:index }
+
+rmt_time_scheduling_working_hours_edit:
+    pattern:  /working-hours-edit/{id}
+    defaults: { _controller: RMTTimeSchedulingWorkingHoursBundle:Default:edit, id: null }
+
+rmt_time_scheduling_working_hours_delete:
+    pattern:  /working-hours-delete/{id}
+    defaults: { _controller: RMTTimeSchedulingWorkingHoursBundle:Default:delete, id: null }

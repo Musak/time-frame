@@ -1,0 +1,9 @@
+{% extends "RMTTimeSchedulingWorkingHoursBundle::layout.html.twig" %}
+
+{% block working_hours %}
+<form action="{{ path('rmt_time_scheduling_working_hours_edit') }}" method="post" {{ form_enctype(form) }}>
+    {{ form_widget(form) }}
+
+    <input type="submit" />
+</form>
+{% endblock %}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database name="default" namespace="RMT\TimeScheduling\Model" defaultIdMethod="native">
+
+    <table name="day">
+    	<column name="id" type="integer" primaryKey="true" autoIncrement="true" />
+    	<column name="value" type="varchar" />
+    </table>
+
+    <!-- add user as a foreign key constraint -->
+    <table name="day_interval">
+    	<column name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <column name="user_id" type="integer" required="true" />
+        <foreign-key foreignTable="fos_user">
+            <reference local="user_id" foreign="id" />
+        </foreign-key>
+    	<column name="day_id" type="integer" />
+    	<foreign-key foreignTable="day">
+    		<reference local="day_id" foreign="id" />
+    	</foreign-key>
+    	<column name="start_hour" type="time" />
+    	<column name="end_hour" type="time" />
+    </table>
+
+</database>
