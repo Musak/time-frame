@@ -3,3 +3,4 @@ RMT\TimeScheduling\Model\DayInterval:
         - Callback:
             methods:
                 -    [RMT\TimeScheduling\DayIntervalValidator, isValidInterval]
+                -    [RMT\TimeScheduling\DayIntervalValidator, isUniqueDay]
