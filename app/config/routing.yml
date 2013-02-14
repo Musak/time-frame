@@ -1,5 +1,8 @@
 rmt_time_scheduling_reservations:
     resource: "@RMTTimeSchedulingReservationsBundle/Resources/config/routing.yml"
+
+rmt_time_scheduling_weekly_grid:
+    resource: "@RMTTimeSchedulingWeeklyGridBundle/Resources/config/routing.yml"
     prefix:   /
 
 rmt_user_managment_user:

@@ -1,0 +1,66 @@
+{% extends "RMTTimeSchedulingWeeklyGridBundle::layout.html.twig" %}
+
+{% block weekly_grid %}
+
+<table class='table'>
+
+	<thead>
+		<th>
+			Hours
+		</th>
+		<th>
+			Monday
+		</th>
+		<th>
+			Tuesday
+		</th>
+		<th>
+			Wednesday
+
+		</th>
+		<th>
+			Thursday
+		</th>
+		<th>
+			Friday
+		</th>
+		<th>
+			Saturday
+		</th>
+		<th>
+			Sunday
+		</th>
+	</thead>
+	<tbody>
+
+		 {% for i in range (0,24) %}
+		 	
+		 	<tr>
+		 		<td>
+		 			{{i}}:00
+		 		</td>
+		 			<td>
+		 		</td>
+		 			<td>
+		 		</td>
+		 			<td>
+		 		</td>
+		 			<td>
+		 		</td>
+		 			<td>
+		 		</td>
+		 			<td>
+		 		</td>
+		 			<td>
+		 		</td>
+		 	
+
+		 	</tr>
+
+		 {% endfor %}
+
+	</tbody>
+
+</table>
+
+{% endblock %}
