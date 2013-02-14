@@ -1,3 +1,7 @@
+rmt_user_managment_dashboard:
+    resource: "@RMTUserManagmentDashboardBundle/Resources/config/routing.yml"
+    prefix:   /
+
 rmt_user_managment_user:
     resource: "@RMTUserManagmentUserBundle/Controller/"
     type:     annotation
