@@ -42,7 +42,7 @@ class DefaultController extends Controller
             }
         }
         return $this->render('RMTTimeSchedulingWorkingHoursBundle:Default:edit.html.twig',
-            array('form' => $form->createView()));
+            array('form' => $form->createView(), 'id' => $id));
     }
 
     // @todo access control
