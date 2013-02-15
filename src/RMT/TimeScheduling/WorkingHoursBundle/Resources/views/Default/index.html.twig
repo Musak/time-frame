@@ -1,11 +1,26 @@
 {% extends "RMTTimeSchedulingWorkingHoursBundle::layout.html.twig" %}
 
 {% block working_hours %}
-{% for day_interval in day_intervals %}
-	{{ day_interval.output }}
-	<a href="{{ path('rmt_time_scheduling_working_hours_edit', {'id': day_interval.id} ) }}">Edit</a>
-	<a href="{{ path('rmt_time_scheduling_working_hours_delete', {'id': day_interval.id}) }}">Delete</a>
-	<br />
-{% endfor %}
+<table class="table">
+	<thead>
+		<th>Day</th>
+		<th>Start hour</th>
+		<th>End hour</th>
+		<th>Actions</th>
+	</thead>
+	<tbody>
+		{% for day_interval in day_intervals %}
+			<tr>
+				<td>{{ day_interval.day.value }}</td>
+				<td>{{ day_interval.startHourDisplay }}</td>
+				<td>{{ day_interval.endHourDisplay }}</td>
+				<td>
+					<a href="{{ path('rmt_time_scheduling_working_hours_edit', {'id': day_interval.id} ) }}">Edit</a>
+					<a href="{{ path('rmt_time_scheduling_working_hours_delete', {'id': day_interval.id}) }}">Delete</a>
+				</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
 <a href="{{ path('rmt_time_scheduling_working_hours_edit') }}">New</a>
 {% endblock %}
