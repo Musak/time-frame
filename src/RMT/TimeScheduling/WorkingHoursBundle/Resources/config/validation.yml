@@ -3,4 +3,6 @@ RMT\TimeScheduling\Model\DayInterval:
         - Callback:
             methods:
                 -    [RMT\TimeScheduling\DayIntervalValidator, isValidInterval]
-                -    [RMT\TimeScheduling\DayIntervalValidator, isUniqueDay]
+        - Propel\PropelBundle\Validator\Constraints\UniqueObject:
+            fields: [user_id, day_id]
+            message: You already defined hours for this day!
