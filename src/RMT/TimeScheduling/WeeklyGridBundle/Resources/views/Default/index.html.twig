@@ -39,22 +39,13 @@
 		 		<td>
 		 			{{i}}:00
 		 		</td>
+		 		{% for j in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] %}
 		 			<td>
-		 		</td>
-		 			<td>
-		 		</td>
-		 			<td>
-		 		</td>
-		 			<td>
-		 		</td>
-		 			<td>
-		 		</td>
-		 			<td>
-		 		</td>
-		 			<td>
-		 		</td>
-		 	
-
+		 				{%if days[j] is defined and i >= days[j].start_hour and i <= days[j].end_hour %}
+		 		    		<span style="background-color: #99ff99; display: block;">&nbsp;</span>
+		 		 		{% endif %}
+		 		 	</td>
+		 		{% endfor %}
 		 	</tr>
 
 		 {% endfor %}
