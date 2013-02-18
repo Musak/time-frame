@@ -16,6 +16,7 @@ use RMT\TimeScheduling\Model\Day;
 use RMT\TimeScheduling\Model\DayInterval;
 use RMT\TimeScheduling\Model\DayPeer;
 use RMT\TimeScheduling\Model\DayQuery;
+use RMT\TimeScheduling\Model\Reservation;
 
 /**
  * @method DayQuery orderById($order = Criteria::ASC) Order by the id column
@@ -28,6 +29,10 @@ use RMT\TimeScheduling\Model\DayQuery;
  * @method DayQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method DayQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
+ * @method DayQuery leftJoinReservation($relationAlias = null) Adds a LEFT JOIN clause to the query using the Reservation relation
+ * @method DayQuery rightJoinReservation($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Reservation relation
+ * @method DayQuery innerJoinReservation($relationAlias = null) Adds a INNER JOIN clause to the query using the Reservation relation
+ *
  * @method DayQuery leftJoinDayInterval($relationAlias = null) Adds a LEFT JOIN clause to the query using the DayInterval relation
  * @method DayQuery rightJoinDayInterval($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DayInterval relation
  * @method DayQuery innerJoinDayInterval($relationAlias = null) Adds a INNER JOIN clause to the query using the DayInterval relation
@@ -35,7 +40,6 @@ use RMT\TimeScheduling\Model\DayQuery;
  * @method Day findOne(PropelPDO $con = null) Return the first Day matching the query
  * @method Day findOneOrCreate(PropelPDO $con = null) Return the first Day matching the query, or a new Day object populated from the query conditions when no match is found
  *
- * @method Day findOneById(int $id) Return the first Day filtered by the id column
  * @method Day findOneByValue(string $value) Return the first Day filtered by the value column
  *
  * @method array findById(int $id) Return Day objects filtered by the id column
@@ -59,7 +63,7 @@ abstract class BaseDayQuery extends ModelCriteria
      * Returns a new DayQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     DayQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   DayQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return DayQuery
      */
@@ -116,18 +120,32 @@ abstract class BaseDayQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Day A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Day A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Day A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `VALUE` FROM `day` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `value` FROM `day` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -223,7 +241,8 @@ abstract class BaseDayQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -236,8 +255,22 @@ abstract class BaseDayQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(DayPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(DayPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(DayPeer::ID, $id, $comparison);
@@ -273,13 +306,87 @@ abstract class BaseDayQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related Reservation object
+     *
+     * @param   Reservation|PropelObjectCollection $reservation  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 DayQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByReservation($reservation, $comparison = null)
+    {
+        if ($reservation instanceof Reservation) {
+            return $this
+                ->addUsingAlias(DayPeer::ID, $reservation->getDayId(), $comparison);
+        } elseif ($reservation instanceof PropelObjectCollection) {
+            return $this
+                ->useReservationQuery()
+                ->filterByPrimaryKeys($reservation->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByReservation() only accepts arguments of type Reservation or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Reservation relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return DayQuery The current query, for fluid interface
+     */
+    public function joinReservation($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Reservation');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Reservation');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Reservation relation Reservation object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \RMT\TimeScheduling\Model\ReservationQuery A secondary query class using the current class as primary query
+     */
+    public function useReservationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinReservation($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Reservation', '\RMT\TimeScheduling\Model\ReservationQuery');
+    }
+
+    /**
      * Filter the query by a related DayInterval object
      *
      * @param   DayInterval|PropelObjectCollection $dayInterval  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   DayQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 DayQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByDayInterval($dayInterval, $comparison = null)
     {

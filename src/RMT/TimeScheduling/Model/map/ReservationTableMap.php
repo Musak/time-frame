@@ -7,7 +7,7 @@ use \TableMap;
 
 
 /**
- * This class defines the structure of the 'day_interval' table.
+ * This class defines the structure of the 'reservation' table.
  *
  *
  *
@@ -18,13 +18,13 @@ use \TableMap;
  *
  * @package    propel.generator.src.RMT.TimeScheduling.Model.map
  */
-class DayIntervalTableMap extends TableMap
+class ReservationTableMap extends TableMap
 {
 
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.RMT.TimeScheduling.Model.map.DayIntervalTableMap';
+    const CLASS_NAME = 'src.RMT.TimeScheduling.Model.map.ReservationTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -36,17 +36,18 @@ class DayIntervalTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('day_interval');
-        $this->setPhpName('DayInterval');
-        $this->setClassname('RMT\\TimeScheduling\\Model\\DayInterval');
+        $this->setName('reservation');
+        $this->setPhpName('Reservation');
+        $this->setClassname('RMT\\TimeScheduling\\Model\\Reservation');
         $this->setPackage('src.RMT.TimeScheduling.Model');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('user_id', 'UserId', 'INTEGER', 'fos_user', 'id', true, null, null);
+        $this->addForeignKey('reservee_user_id', 'ReserveeUserId', 'INTEGER', 'fos_user', 'id', true, null, null);
+        $this->addForeignKey('reserver_user_id', 'ReserverUserId', 'INTEGER', 'fos_user', 'id', true, null, null);
         $this->addForeignKey('day_id', 'DayId', 'INTEGER', 'day', 'id', false, null, null);
-        $this->addColumn('start_hour', 'StartHour', 'TIME', false, null, null);
-        $this->addColumn('end_hour', 'EndHour', 'TIME', false, null, null);
+        $this->addColumn('start_time', 'StartTime', 'TIME', false, null, null);
+        $this->addColumn('end_time', 'EndTime', 'TIME', false, null, null);
         // validators
     } // initialize()
 
@@ -55,8 +56,9 @@ class DayIntervalTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('User', 'FOS\\UserBundle\\Propel\\User', RelationMap::MANY_TO_ONE, array('user_id' => 'id', ), null, null);
+        $this->addRelation('UserRelatedByReserveeUserId', 'FOS\\UserBundle\\Propel\\User', RelationMap::MANY_TO_ONE, array('reservee_user_id' => 'id', ), null, null);
+        $this->addRelation('UserRelatedByReserverUserId', 'FOS\\UserBundle\\Propel\\User', RelationMap::MANY_TO_ONE, array('reserver_user_id' => 'id', ), null, null);
         $this->addRelation('Day', 'RMT\\TimeScheduling\\Model\\Day', RelationMap::MANY_TO_ONE, array('day_id' => 'id', ), null, null);
     } // buildRelations()
 
-} // DayIntervalTableMap
+} // ReservationTableMap

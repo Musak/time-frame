@@ -10,58 +10,61 @@ use \Propel;
 use \PropelException;
 use \PropelPDO;
 use FOS\UserBundle\Propel\UserPeer;
-use RMT\TimeScheduling\Model\DayInterval;
-use RMT\TimeScheduling\Model\DayIntervalPeer;
 use RMT\TimeScheduling\Model\DayPeer;
-use RMT\TimeScheduling\Model\map\DayIntervalTableMap;
+use RMT\TimeScheduling\Model\Reservation;
+use RMT\TimeScheduling\Model\ReservationPeer;
+use RMT\TimeScheduling\Model\map\ReservationTableMap;
 
-abstract class BaseDayIntervalPeer
+abstract class BaseReservationPeer
 {
 
     /** the default database name for this class */
     const DATABASE_NAME = 'default';
 
     /** the table name for this class */
-    const TABLE_NAME = 'day_interval';
+    const TABLE_NAME = 'reservation';
 
     /** the related Propel class for this table */
-    const OM_CLASS = 'RMT\\TimeScheduling\\Model\\DayInterval';
+    const OM_CLASS = 'RMT\\TimeScheduling\\Model\\Reservation';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'DayIntervalTableMap';
+    const TM_CLASS = 'ReservationTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 6;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /** the column name for the id field */
-    const ID = 'day_interval.id';
+    const ID = 'reservation.id';
 
-    /** the column name for the user_id field */
-    const USER_ID = 'day_interval.user_id';
+    /** the column name for the reservee_user_id field */
+    const RESERVEE_USER_ID = 'reservation.reservee_user_id';
+
+    /** the column name for the reserver_user_id field */
+    const RESERVER_USER_ID = 'reservation.reserver_user_id';
 
     /** the column name for the day_id field */
-    const DAY_ID = 'day_interval.day_id';
+    const DAY_ID = 'reservation.day_id';
 
-    /** the column name for the start_hour field */
-    const START_HOUR = 'day_interval.start_hour';
+    /** the column name for the start_time field */
+    const START_TIME = 'reservation.start_time';
 
-    /** the column name for the end_hour field */
-    const END_HOUR = 'day_interval.end_hour';
+    /** the column name for the end_time field */
+    const END_TIME = 'reservation.end_time';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identiy map to hold any loaded instances of DayInterval objects.
+     * An identiy map to hold any loaded instances of Reservation objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
-     * @var        array DayInterval[]
+     * @var        array Reservation[]
      */
     public static $instances = array();
 
@@ -70,30 +73,30 @@ abstract class BaseDayIntervalPeer
      * holds an array of fieldnames
      *
      * first dimension keys are the type constants
-     * e.g. DayIntervalPeer::$fieldNames[DayIntervalPeer::TYPE_PHPNAME][0] = 'Id'
+     * e.g. ReservationPeer::$fieldNames[ReservationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'UserId', 'DayId', 'StartHour', 'EndHour', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'userId', 'dayId', 'startHour', 'endHour', ),
-        BasePeer::TYPE_COLNAME => array (DayIntervalPeer::ID, DayIntervalPeer::USER_ID, DayIntervalPeer::DAY_ID, DayIntervalPeer::START_HOUR, DayIntervalPeer::END_HOUR, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'USER_ID', 'DAY_ID', 'START_HOUR', 'END_HOUR', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'user_id', 'day_id', 'start_hour', 'end_hour', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'ReserveeUserId', 'ReserverUserId', 'DayId', 'StartTime', 'EndTime', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'reserveeUserId', 'reserverUserId', 'dayId', 'startTime', 'endTime', ),
+        BasePeer::TYPE_COLNAME => array (ReservationPeer::ID, ReservationPeer::RESERVEE_USER_ID, ReservationPeer::RESERVER_USER_ID, ReservationPeer::DAY_ID, ReservationPeer::START_TIME, ReservationPeer::END_TIME, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'RESERVEE_USER_ID', 'RESERVER_USER_ID', 'DAY_ID', 'START_TIME', 'END_TIME', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'reservee_user_id', 'reserver_user_id', 'day_id', 'start_time', 'end_time', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
      * holds an array of keys for quick access to the fieldnames array
      *
      * first dimension keys are the type constants
-     * e.g. DayIntervalPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
+     * e.g. ReservationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'UserId' => 1, 'DayId' => 2, 'StartHour' => 3, 'EndHour' => 4, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'userId' => 1, 'dayId' => 2, 'startHour' => 3, 'endHour' => 4, ),
-        BasePeer::TYPE_COLNAME => array (DayIntervalPeer::ID => 0, DayIntervalPeer::USER_ID => 1, DayIntervalPeer::DAY_ID => 2, DayIntervalPeer::START_HOUR => 3, DayIntervalPeer::END_HOUR => 4, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'USER_ID' => 1, 'DAY_ID' => 2, 'START_HOUR' => 3, 'END_HOUR' => 4, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'user_id' => 1, 'day_id' => 2, 'start_hour' => 3, 'end_hour' => 4, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ReserveeUserId' => 1, 'ReserverUserId' => 2, 'DayId' => 3, 'StartTime' => 4, 'EndTime' => 5, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'reserveeUserId' => 1, 'reserverUserId' => 2, 'dayId' => 3, 'startTime' => 4, 'endTime' => 5, ),
+        BasePeer::TYPE_COLNAME => array (ReservationPeer::ID => 0, ReservationPeer::RESERVEE_USER_ID => 1, ReservationPeer::RESERVER_USER_ID => 2, ReservationPeer::DAY_ID => 3, ReservationPeer::START_TIME => 4, ReservationPeer::END_TIME => 5, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'RESERVEE_USER_ID' => 1, 'RESERVER_USER_ID' => 2, 'DAY_ID' => 3, 'START_TIME' => 4, 'END_TIME' => 5, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'reservee_user_id' => 1, 'reserver_user_id' => 2, 'day_id' => 3, 'start_time' => 4, 'end_time' => 5, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -108,10 +111,10 @@ abstract class BaseDayIntervalPeer
      */
     public static function translateFieldName($name, $fromType, $toType)
     {
-        $toNames = DayIntervalPeer::getFieldNames($toType);
-        $key = isset(DayIntervalPeer::$fieldKeys[$fromType][$name]) ? DayIntervalPeer::$fieldKeys[$fromType][$name] : null;
+        $toNames = ReservationPeer::getFieldNames($toType);
+        $key = isset(ReservationPeer::$fieldKeys[$fromType][$name]) ? ReservationPeer::$fieldKeys[$fromType][$name] : null;
         if ($key === null) {
-            throw new PropelException("'$name' could not be found in the field names of type '$fromType'. These are: " . print_r(DayIntervalPeer::$fieldKeys[$fromType], true));
+            throw new PropelException("'$name' could not be found in the field names of type '$fromType'. These are: " . print_r(ReservationPeer::$fieldKeys[$fromType], true));
         }
 
         return $toNames[$key];
@@ -128,11 +131,11 @@ abstract class BaseDayIntervalPeer
      */
     public static function getFieldNames($type = BasePeer::TYPE_PHPNAME)
     {
-        if (!array_key_exists($type, DayIntervalPeer::$fieldNames)) {
+        if (!array_key_exists($type, ReservationPeer::$fieldNames)) {
             throw new PropelException('Method getFieldNames() expects the parameter $type to be one of the class constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME, BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM. ' . $type . ' was given.');
         }
 
-        return DayIntervalPeer::$fieldNames[$type];
+        return ReservationPeer::$fieldNames[$type];
     }
 
     /**
@@ -144,12 +147,12 @@ abstract class BaseDayIntervalPeer
      *		$c->addJoin(TablePeer::alias("alias1", TablePeer::PRIMARY_KEY_COLUMN), TablePeer::PRIMARY_KEY_COLUMN);
      * </code>
      * @param      string $alias The alias for the current table.
-     * @param      string $column The column name for current table. (i.e. DayIntervalPeer::COLUMN_NAME).
+     * @param      string $column The column name for current table. (i.e. ReservationPeer::COLUMN_NAME).
      * @return string
      */
     public static function alias($alias, $column)
     {
-        return str_replace(DayIntervalPeer::TABLE_NAME.'.', $alias.'.', $column);
+        return str_replace(ReservationPeer::TABLE_NAME.'.', $alias.'.', $column);
     }
 
     /**
@@ -167,17 +170,19 @@ abstract class BaseDayIntervalPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(DayIntervalPeer::ID);
-            $criteria->addSelectColumn(DayIntervalPeer::USER_ID);
-            $criteria->addSelectColumn(DayIntervalPeer::DAY_ID);
-            $criteria->addSelectColumn(DayIntervalPeer::START_HOUR);
-            $criteria->addSelectColumn(DayIntervalPeer::END_HOUR);
+            $criteria->addSelectColumn(ReservationPeer::ID);
+            $criteria->addSelectColumn(ReservationPeer::RESERVEE_USER_ID);
+            $criteria->addSelectColumn(ReservationPeer::RESERVER_USER_ID);
+            $criteria->addSelectColumn(ReservationPeer::DAY_ID);
+            $criteria->addSelectColumn(ReservationPeer::START_TIME);
+            $criteria->addSelectColumn(ReservationPeer::END_TIME);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.user_id');
+            $criteria->addSelectColumn($alias . '.reservee_user_id');
+            $criteria->addSelectColumn($alias . '.reserver_user_id');
             $criteria->addSelectColumn($alias . '.day_id');
-            $criteria->addSelectColumn($alias . '.start_hour');
-            $criteria->addSelectColumn($alias . '.end_hour');
+            $criteria->addSelectColumn($alias . '.start_time');
+            $criteria->addSelectColumn($alias . '.end_time');
         }
     }
 
@@ -197,21 +202,21 @@ abstract class BaseDayIntervalPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(DayIntervalPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(ReservationPeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            DayIntervalPeer::addSelectColumns($criteria);
+            ReservationPeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-        $criteria->setDbName(DayIntervalPeer::DATABASE_NAME); // Set the correct dbName
+        $criteria->setDbName(ReservationPeer::DATABASE_NAME); // Set the correct dbName
 
         if ($con === null) {
-            $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
         // BasePeer returns a PDOStatement
         $stmt = BasePeer::doCount($criteria, $con);
@@ -230,7 +235,7 @@ abstract class BaseDayIntervalPeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return                 DayInterval
+     * @return                 Reservation
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -238,7 +243,7 @@ abstract class BaseDayIntervalPeer
     {
         $critcopy = clone $criteria;
         $critcopy->setLimit(1);
-        $objects = DayIntervalPeer::doSelect($critcopy, $con);
+        $objects = ReservationPeer::doSelect($critcopy, $con);
         if ($objects) {
             return $objects[0];
         }
@@ -256,7 +261,7 @@ abstract class BaseDayIntervalPeer
      */
     public static function doSelect(Criteria $criteria, PropelPDO $con = null)
     {
-        return DayIntervalPeer::populateObjects(DayIntervalPeer::doSelectStmt($criteria, $con));
+        return ReservationPeer::populateObjects(ReservationPeer::doSelectStmt($criteria, $con));
     }
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
@@ -274,16 +279,16 @@ abstract class BaseDayIntervalPeer
     public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         if (!$criteria->hasSelectClause()) {
             $criteria = clone $criteria;
-            DayIntervalPeer::addSelectColumns($criteria);
+            ReservationPeer::addSelectColumns($criteria);
         }
 
         // Set the correct dbName
-        $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+        $criteria->setDbName(ReservationPeer::DATABASE_NAME);
 
         // BasePeer returns a PDOStatement
         return BasePeer::doSelect($criteria, $con);
@@ -297,7 +302,7 @@ abstract class BaseDayIntervalPeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param      DayInterval $obj A DayInterval object.
+     * @param      Reservation $obj A Reservation object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
@@ -306,7 +311,7 @@ abstract class BaseDayIntervalPeer
             if ($key === null) {
                 $key = (string) $obj->getId();
             } // if key === null
-            DayIntervalPeer::$instances[$key] = $obj;
+            ReservationPeer::$instances[$key] = $obj;
         }
     }
 
@@ -318,7 +323,7 @@ abstract class BaseDayIntervalPeer
      * methods in your stub classes -- you may need to explicitly remove objects
      * from the cache in order to prevent returning objects that no longer exist.
      *
-     * @param      mixed $value A DayInterval object or a primary key value.
+     * @param      mixed $value A Reservation object or a primary key value.
      *
      * @return void
      * @throws PropelException - if the value is invalid.
@@ -326,17 +331,17 @@ abstract class BaseDayIntervalPeer
     public static function removeInstanceFromPool($value)
     {
         if (Propel::isInstancePoolingEnabled() && $value !== null) {
-            if (is_object($value) && $value instanceof DayInterval) {
+            if (is_object($value) && $value instanceof Reservation) {
                 $key = (string) $value->getId();
             } elseif (is_scalar($value)) {
                 // assume we've been passed a primary key
                 $key = (string) $value;
             } else {
-                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or DayInterval object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or Reservation object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
                 throw $e;
             }
 
-            unset(DayIntervalPeer::$instances[$key]);
+            unset(ReservationPeer::$instances[$key]);
         }
     } // removeInstanceFromPool()
 
@@ -347,14 +352,14 @@ abstract class BaseDayIntervalPeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return   DayInterval Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return   Reservation Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
     {
         if (Propel::isInstancePoolingEnabled()) {
-            if (isset(DayIntervalPeer::$instances[$key])) {
-                return DayIntervalPeer::$instances[$key];
+            if (isset(ReservationPeer::$instances[$key])) {
+                return ReservationPeer::$instances[$key];
             }
         }
 
@@ -370,16 +375,16 @@ abstract class BaseDayIntervalPeer
     {
       if ($and_clear_all_references)
       {
-        foreach (DayIntervalPeer::$instances as $instance)
+        foreach (ReservationPeer::$instances as $instance)
         {
           $instance->clearAllReferences(true);
         }
       }
-        DayIntervalPeer::$instances = array();
+        ReservationPeer::$instances = array();
     }
 
     /**
-     * Method to invalidate the instance pool of all tables related to day_interval
+     * Method to invalidate the instance pool of all tables related to reservation
      * by a foreign key with ON DELETE CASCADE
      */
     public static function clearRelatedInstancePool()
@@ -433,11 +438,11 @@ abstract class BaseDayIntervalPeer
         $results = array();
 
         // set the class once to avoid overhead in the loop
-        $cls = DayIntervalPeer::getOMClass();
+        $cls = ReservationPeer::getOMClass();
         // populate the object(s)
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key = DayIntervalPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj = DayIntervalPeer::getInstanceFromPool($key))) {
+            $key = ReservationPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj = ReservationPeer::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -446,7 +451,7 @@ abstract class BaseDayIntervalPeer
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                DayIntervalPeer::addInstanceToPool($obj, $key);
+                ReservationPeer::addInstanceToPool($obj, $key);
             } // if key exists
         }
         $stmt->closeCursor();
@@ -460,21 +465,21 @@ abstract class BaseDayIntervalPeer
      * @param      int $startcol The 0-based offset for reading from the resultset row.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
-     * @return array (DayInterval object, last column rank)
+     * @return array (Reservation object, last column rank)
      */
     public static function populateObject($row, $startcol = 0)
     {
-        $key = DayIntervalPeer::getPrimaryKeyHashFromRow($row, $startcol);
-        if (null !== ($obj = DayIntervalPeer::getInstanceFromPool($key))) {
+        $key = ReservationPeer::getPrimaryKeyHashFromRow($row, $startcol);
+        if (null !== ($obj = ReservationPeer::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $startcol, true); // rehydrate
-            $col = $startcol + DayIntervalPeer::NUM_HYDRATE_COLUMNS;
+            $col = $startcol + ReservationPeer::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = DayIntervalPeer::OM_CLASS;
+            $cls = ReservationPeer::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $startcol);
-            DayIntervalPeer::addInstanceToPool($obj, $key);
+            ReservationPeer::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -482,7 +487,7 @@ abstract class BaseDayIntervalPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related User table
+     * Returns the number of rows matching criteria, joining the related UserRelatedByReserveeUserId table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -490,7 +495,7 @@ abstract class BaseDayIntervalPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinUser(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinUserRelatedByReserveeUserId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -498,26 +503,77 @@ abstract class BaseDayIntervalPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(DayIntervalPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(ReservationPeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            DayIntervalPeer::addSelectColumns($criteria);
+            ReservationPeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 
         // Set the correct dbName
-        $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+        $criteria->setDbName(ReservationPeer::DATABASE_NAME);
 
         if ($con === null) {
-            $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(DayIntervalPeer::USER_ID, UserPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::RESERVEE_USER_ID, UserPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related UserRelatedByReserverUserId table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinUserRelatedByReserverUserId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(ReservationPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            ReservationPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(ReservationPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(ReservationPeer::RESERVER_USER_ID, UserPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -549,26 +605,26 @@ abstract class BaseDayIntervalPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(DayIntervalPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(ReservationPeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            DayIntervalPeer::addSelectColumns($criteria);
+            ReservationPeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 
         // Set the correct dbName
-        $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+        $criteria->setDbName(ReservationPeer::DATABASE_NAME);
 
         if ($con === null) {
-            $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(DayIntervalPeer::DAY_ID, DayPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::DAY_ID, DayPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -584,45 +640,45 @@ abstract class BaseDayIntervalPeer
 
 
     /**
-     * Selects a collection of DayInterval objects pre-filled with their User objects.
+     * Selects a collection of Reservation objects pre-filled with their User objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of DayInterval objects.
+     * @return array           Array of Reservation objects.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinUser(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinUserRelatedByReserveeUserId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
         // Set the correct dbName if it has not been overridden
         if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+            $criteria->setDbName(ReservationPeer::DATABASE_NAME);
         }
 
-        DayIntervalPeer::addSelectColumns($criteria);
-        $startcol = DayIntervalPeer::NUM_HYDRATE_COLUMNS;
+        ReservationPeer::addSelectColumns($criteria);
+        $startcol = ReservationPeer::NUM_HYDRATE_COLUMNS;
         UserPeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(DayIntervalPeer::USER_ID, UserPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::RESERVEE_USER_ID, UserPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = DayIntervalPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = DayIntervalPeer::getInstanceFromPool($key1))) {
+            $key1 = ReservationPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ReservationPeer::getInstanceFromPool($key1))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj1->hydrate($row, 0, true); // rehydrate
             } else {
 
-                $cls = DayIntervalPeer::getOMClass();
+                $cls = ReservationPeer::getOMClass();
 
                 $obj1 = new $cls();
                 $obj1->hydrate($row);
-                DayIntervalPeer::addInstanceToPool($obj1, $key1);
+                ReservationPeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
             $key2 = UserPeer::getPrimaryKeyHashFromRow($row, $startcol);
@@ -637,8 +693,8 @@ abstract class BaseDayIntervalPeer
                     UserPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (DayInterval) to $obj2 (User)
-                $obj2->addDayInterval($obj1);
+                // Add the $obj1 (Reservation) to $obj2 (User)
+                $obj2->addReservationRelatedByReserveeUserId($obj1);
 
             } // if joined row was not null
 
@@ -651,11 +707,78 @@ abstract class BaseDayIntervalPeer
 
 
     /**
-     * Selects a collection of DayInterval objects pre-filled with their Day objects.
+     * Selects a collection of Reservation objects pre-filled with their User objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of DayInterval objects.
+     * @return array           Array of Reservation objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinUserRelatedByReserverUserId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(ReservationPeer::DATABASE_NAME);
+        }
+
+        ReservationPeer::addSelectColumns($criteria);
+        $startcol = ReservationPeer::NUM_HYDRATE_COLUMNS;
+        UserPeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(ReservationPeer::RESERVER_USER_ID, UserPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = ReservationPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ReservationPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = ReservationPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                ReservationPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = UserPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = UserPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = UserPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    UserPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (Reservation) to $obj2 (User)
+                $obj2->addReservationRelatedByReserverUserId($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Reservation objects pre-filled with their Day objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Reservation objects.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -665,31 +788,31 @@ abstract class BaseDayIntervalPeer
 
         // Set the correct dbName if it has not been overridden
         if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+            $criteria->setDbName(ReservationPeer::DATABASE_NAME);
         }
 
-        DayIntervalPeer::addSelectColumns($criteria);
-        $startcol = DayIntervalPeer::NUM_HYDRATE_COLUMNS;
+        ReservationPeer::addSelectColumns($criteria);
+        $startcol = ReservationPeer::NUM_HYDRATE_COLUMNS;
         DayPeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(DayIntervalPeer::DAY_ID, DayPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::DAY_ID, DayPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = DayIntervalPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = DayIntervalPeer::getInstanceFromPool($key1))) {
+            $key1 = ReservationPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ReservationPeer::getInstanceFromPool($key1))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj1->hydrate($row, 0, true); // rehydrate
             } else {
 
-                $cls = DayIntervalPeer::getOMClass();
+                $cls = ReservationPeer::getOMClass();
 
                 $obj1 = new $cls();
                 $obj1->hydrate($row);
-                DayIntervalPeer::addInstanceToPool($obj1, $key1);
+                ReservationPeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
             $key2 = DayPeer::getPrimaryKeyHashFromRow($row, $startcol);
@@ -704,8 +827,8 @@ abstract class BaseDayIntervalPeer
                     DayPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (DayInterval) to $obj2 (Day)
-                $obj2->addDayInterval($obj1);
+                // Add the $obj1 (Reservation) to $obj2 (Day)
+                $obj2->addReservation($obj1);
 
             } // if joined row was not null
 
@@ -734,28 +857,30 @@ abstract class BaseDayIntervalPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(DayIntervalPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(ReservationPeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            DayIntervalPeer::addSelectColumns($criteria);
+            ReservationPeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 
         // Set the correct dbName
-        $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+        $criteria->setDbName(ReservationPeer::DATABASE_NAME);
 
         if ($con === null) {
-            $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(DayIntervalPeer::USER_ID, UserPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::RESERVEE_USER_ID, UserPeer::ID, $join_behavior);
 
-        $criteria->addJoin(DayIntervalPeer::DAY_ID, DayPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::RESERVER_USER_ID, UserPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ReservationPeer::DAY_ID, DayPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -770,12 +895,12 @@ abstract class BaseDayIntervalPeer
     }
 
     /**
-     * Selects a collection of DayInterval objects pre-filled with all related objects.
+     * Selects a collection of Reservation objects pre-filled with all related objects.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of DayInterval objects.
+     * @return array           Array of Reservation objects.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -785,37 +910,42 @@ abstract class BaseDayIntervalPeer
 
         // Set the correct dbName if it has not been overridden
         if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+            $criteria->setDbName(ReservationPeer::DATABASE_NAME);
         }
 
-        DayIntervalPeer::addSelectColumns($criteria);
-        $startcol2 = DayIntervalPeer::NUM_HYDRATE_COLUMNS;
+        ReservationPeer::addSelectColumns($criteria);
+        $startcol2 = ReservationPeer::NUM_HYDRATE_COLUMNS;
 
         UserPeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + UserPeer::NUM_HYDRATE_COLUMNS;
 
+        UserPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + UserPeer::NUM_HYDRATE_COLUMNS;
+
         DayPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + DayPeer::NUM_HYDRATE_COLUMNS;
+        $startcol5 = $startcol4 + DayPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(DayIntervalPeer::USER_ID, UserPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::RESERVEE_USER_ID, UserPeer::ID, $join_behavior);
 
-        $criteria->addJoin(DayIntervalPeer::DAY_ID, DayPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::RESERVER_USER_ID, UserPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ReservationPeer::DAY_ID, DayPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = DayIntervalPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = DayIntervalPeer::getInstanceFromPool($key1))) {
+            $key1 = ReservationPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ReservationPeer::getInstanceFromPool($key1))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj1->hydrate($row, 0, true); // rehydrate
             } else {
-                $cls = DayIntervalPeer::getOMClass();
+                $cls = ReservationPeer::getOMClass();
 
                 $obj1 = new $cls();
                 $obj1->hydrate($row);
-                DayIntervalPeer::addInstanceToPool($obj1, $key1);
+                ReservationPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
             // Add objects for joined User rows
@@ -832,26 +962,44 @@ abstract class BaseDayIntervalPeer
                     UserPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 loaded
 
-                // Add the $obj1 (DayInterval) to the collection in $obj2 (User)
-                $obj2->addDayInterval($obj1);
+                // Add the $obj1 (Reservation) to the collection in $obj2 (User)
+                $obj2->addReservationRelatedByReserveeUserId($obj1);
+            } // if joined row not null
+
+            // Add objects for joined User rows
+
+            $key3 = UserPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+            if ($key3 !== null) {
+                $obj3 = UserPeer::getInstanceFromPool($key3);
+                if (!$obj3) {
+
+                    $cls = UserPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    UserPeer::addInstanceToPool($obj3, $key3);
+                } // if obj3 loaded
+
+                // Add the $obj1 (Reservation) to the collection in $obj3 (User)
+                $obj3->addReservationRelatedByReserverUserId($obj1);
             } // if joined row not null
 
             // Add objects for joined Day rows
 
-            $key3 = DayPeer::getPrimaryKeyHashFromRow($row, $startcol3);
-            if ($key3 !== null) {
-                $obj3 = DayPeer::getInstanceFromPool($key3);
-                if (!$obj3) {
+            $key4 = DayPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+            if ($key4 !== null) {
+                $obj4 = DayPeer::getInstanceFromPool($key4);
+                if (!$obj4) {
 
                     $cls = DayPeer::getOMClass();
 
-                    $obj3 = new $cls();
-                    $obj3->hydrate($row, $startcol3);
-                    DayPeer::addInstanceToPool($obj3, $key3);
-                } // if obj3 loaded
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    DayPeer::addInstanceToPool($obj4, $key4);
+                } // if obj4 loaded
 
-                // Add the $obj1 (DayInterval) to the collection in $obj3 (Day)
-                $obj3->addDayInterval($obj1);
+                // Add the $obj1 (Reservation) to the collection in $obj4 (Day)
+                $obj4->addReservation($obj1);
             } // if joined row not null
 
             $results[] = $obj1;
@@ -863,7 +1011,7 @@ abstract class BaseDayIntervalPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related User table
+     * Returns the number of rows matching criteria, joining the related UserRelatedByReserveeUserId table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -871,7 +1019,7 @@ abstract class BaseDayIntervalPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAllExceptUser(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinAllExceptUserRelatedByReserveeUserId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -879,26 +1027,77 @@ abstract class BaseDayIntervalPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(DayIntervalPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(ReservationPeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            DayIntervalPeer::addSelectColumns($criteria);
+            ReservationPeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY should not affect count
 
         // Set the correct dbName
-        $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+        $criteria->setDbName(ReservationPeer::DATABASE_NAME);
 
         if ($con === null) {
-            $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(DayIntervalPeer::DAY_ID, DayPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::DAY_ID, DayPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related UserRelatedByReserverUserId table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptUserRelatedByReserverUserId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(ReservationPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            ReservationPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(ReservationPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(ReservationPeer::DAY_ID, DayPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -930,26 +1129,28 @@ abstract class BaseDayIntervalPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(DayIntervalPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(ReservationPeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            DayIntervalPeer::addSelectColumns($criteria);
+            ReservationPeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY should not affect count
 
         // Set the correct dbName
-        $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+        $criteria->setDbName(ReservationPeer::DATABASE_NAME);
 
         if ($con === null) {
-            $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(DayIntervalPeer::USER_ID, UserPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::RESERVEE_USER_ID, UserPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ReservationPeer::RESERVER_USER_ID, UserPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -965,16 +1166,16 @@ abstract class BaseDayIntervalPeer
 
 
     /**
-     * Selects a collection of DayInterval objects pre-filled with all related objects except User.
+     * Selects a collection of Reservation objects pre-filled with all related objects except UserRelatedByReserveeUserId.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of DayInterval objects.
+     * @return array           Array of Reservation objects.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptUser(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptUserRelatedByReserveeUserId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -982,33 +1183,33 @@ abstract class BaseDayIntervalPeer
         // $criteria->getDbName() will return the same object if not set to another value
         // so == check is okay and faster
         if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+            $criteria->setDbName(ReservationPeer::DATABASE_NAME);
         }
 
-        DayIntervalPeer::addSelectColumns($criteria);
-        $startcol2 = DayIntervalPeer::NUM_HYDRATE_COLUMNS;
+        ReservationPeer::addSelectColumns($criteria);
+        $startcol2 = ReservationPeer::NUM_HYDRATE_COLUMNS;
 
         DayPeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + DayPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(DayIntervalPeer::DAY_ID, DayPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::DAY_ID, DayPeer::ID, $join_behavior);
 
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = DayIntervalPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = DayIntervalPeer::getInstanceFromPool($key1))) {
+            $key1 = ReservationPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ReservationPeer::getInstanceFromPool($key1))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj1->hydrate($row, 0, true); // rehydrate
             } else {
-                $cls = DayIntervalPeer::getOMClass();
+                $cls = ReservationPeer::getOMClass();
 
                 $obj1 = new $cls();
                 $obj1->hydrate($row);
-                DayIntervalPeer::addInstanceToPool($obj1, $key1);
+                ReservationPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
                 // Add objects for joined Day rows
@@ -1025,8 +1226,8 @@ abstract class BaseDayIntervalPeer
                     DayPeer::addInstanceToPool($obj2, $key2);
                 } // if $obj2 already loaded
 
-                // Add the $obj1 (DayInterval) to the collection in $obj2 (Day)
-                $obj2->addDayInterval($obj1);
+                // Add the $obj1 (Reservation) to the collection in $obj2 (Day)
+                $obj2->addReservation($obj1);
 
             } // if joined row is not null
 
@@ -1039,12 +1240,86 @@ abstract class BaseDayIntervalPeer
 
 
     /**
-     * Selects a collection of DayInterval objects pre-filled with all related objects except Day.
+     * Selects a collection of Reservation objects pre-filled with all related objects except UserRelatedByReserverUserId.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of DayInterval objects.
+     * @return array           Array of Reservation objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptUserRelatedByReserverUserId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(ReservationPeer::DATABASE_NAME);
+        }
+
+        ReservationPeer::addSelectColumns($criteria);
+        $startcol2 = ReservationPeer::NUM_HYDRATE_COLUMNS;
+
+        DayPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + DayPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(ReservationPeer::DAY_ID, DayPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = ReservationPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ReservationPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = ReservationPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                ReservationPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Day rows
+
+                $key2 = DayPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = DayPeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = DayPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    DayPeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (Reservation) to the collection in $obj2 (Day)
+                $obj2->addReservation($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Reservation objects pre-filled with all related objects except Day.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Reservation objects.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -1056,33 +1331,38 @@ abstract class BaseDayIntervalPeer
         // $criteria->getDbName() will return the same object if not set to another value
         // so == check is okay and faster
         if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+            $criteria->setDbName(ReservationPeer::DATABASE_NAME);
         }
 
-        DayIntervalPeer::addSelectColumns($criteria);
-        $startcol2 = DayIntervalPeer::NUM_HYDRATE_COLUMNS;
+        ReservationPeer::addSelectColumns($criteria);
+        $startcol2 = ReservationPeer::NUM_HYDRATE_COLUMNS;
 
         UserPeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + UserPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(DayIntervalPeer::USER_ID, UserPeer::ID, $join_behavior);
+        UserPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + UserPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(ReservationPeer::RESERVEE_USER_ID, UserPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ReservationPeer::RESERVER_USER_ID, UserPeer::ID, $join_behavior);
 
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = DayIntervalPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = DayIntervalPeer::getInstanceFromPool($key1))) {
+            $key1 = ReservationPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ReservationPeer::getInstanceFromPool($key1))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj1->hydrate($row, 0, true); // rehydrate
             } else {
-                $cls = DayIntervalPeer::getOMClass();
+                $cls = ReservationPeer::getOMClass();
 
                 $obj1 = new $cls();
                 $obj1->hydrate($row);
-                DayIntervalPeer::addInstanceToPool($obj1, $key1);
+                ReservationPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
                 // Add objects for joined User rows
@@ -1099,8 +1379,27 @@ abstract class BaseDayIntervalPeer
                     UserPeer::addInstanceToPool($obj2, $key2);
                 } // if $obj2 already loaded
 
-                // Add the $obj1 (DayInterval) to the collection in $obj2 (User)
-                $obj2->addDayInterval($obj1);
+                // Add the $obj1 (Reservation) to the collection in $obj2 (User)
+                $obj2->addReservationRelatedByReserveeUserId($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined User rows
+
+                $key3 = UserPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = UserPeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = UserPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    UserPeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (Reservation) to the collection in $obj3 (User)
+                $obj3->addReservationRelatedByReserverUserId($obj1);
 
             } // if joined row is not null
 
@@ -1120,7 +1419,7 @@ abstract class BaseDayIntervalPeer
      */
     public static function getTableMap()
     {
-        return Propel::getDatabaseMap(DayIntervalPeer::DATABASE_NAME)->getTable(DayIntervalPeer::TABLE_NAME);
+        return Propel::getDatabaseMap(ReservationPeer::DATABASE_NAME)->getTable(ReservationPeer::TABLE_NAME);
     }
 
     /**
@@ -1128,9 +1427,9 @@ abstract class BaseDayIntervalPeer
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getDatabaseMap(BaseDayIntervalPeer::DATABASE_NAME);
-      if (!$dbMap->hasTable(BaseDayIntervalPeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new DayIntervalTableMap());
+      $dbMap = Propel::getDatabaseMap(BaseReservationPeer::DATABASE_NAME);
+      if (!$dbMap->hasTable(BaseReservationPeer::TABLE_NAME)) {
+        $dbMap->addTableObject(new ReservationTableMap());
       }
     }
 
@@ -1142,13 +1441,13 @@ abstract class BaseDayIntervalPeer
      */
     public static function getOMClass($row = 0, $colnum = 0)
     {
-        return DayIntervalPeer::OM_CLASS;
+        return ReservationPeer::OM_CLASS;
     }
 
     /**
-     * Performs an INSERT on the database, given a DayInterval or Criteria object.
+     * Performs an INSERT on the database, given a Reservation or Criteria object.
      *
-     * @param      mixed $values Criteria or DayInterval object containing data that is used to create the INSERT statement.
+     * @param      mixed $values Criteria or Reservation object containing data that is used to create the INSERT statement.
      * @param      PropelPDO $con the PropelPDO connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -1157,22 +1456,22 @@ abstract class BaseDayIntervalPeer
     public static function doInsert($values, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
         } else {
-            $criteria = $values->buildCriteria(); // build Criteria from DayInterval object
+            $criteria = $values->buildCriteria(); // build Criteria from Reservation object
         }
 
-        if ($criteria->containsKey(DayIntervalPeer::ID) && $criteria->keyContainsValue(DayIntervalPeer::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.DayIntervalPeer::ID.')');
+        if ($criteria->containsKey(ReservationPeer::ID) && $criteria->keyContainsValue(ReservationPeer::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ReservationPeer::ID.')');
         }
 
 
         // Set the correct dbName
-        $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+        $criteria->setDbName(ReservationPeer::DATABASE_NAME);
 
         try {
             // use transaction because $criteria could contain info
@@ -1189,9 +1488,9 @@ abstract class BaseDayIntervalPeer
     }
 
     /**
-     * Performs an UPDATE on the database, given a DayInterval or Criteria object.
+     * Performs an UPDATE on the database, given a Reservation or Criteria object.
      *
-     * @param      mixed $values Criteria or DayInterval object containing data that is used to create the UPDATE statement.
+     * @param      mixed $values Criteria or Reservation object containing data that is used to create the UPDATE statement.
      * @param      PropelPDO $con The connection to use (specify PropelPDO connection object to exert more control over transactions).
      * @return int             The number of affected rows (if supported by underlying database driver).
      * @throws PropelException Any exceptions caught during processing will be
@@ -1200,35 +1499,35 @@ abstract class BaseDayIntervalPeer
     public static function doUpdate($values, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
-        $selectCriteria = new Criteria(DayIntervalPeer::DATABASE_NAME);
+        $selectCriteria = new Criteria(ReservationPeer::DATABASE_NAME);
 
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
 
-            $comparison = $criteria->getComparison(DayIntervalPeer::ID);
-            $value = $criteria->remove(DayIntervalPeer::ID);
+            $comparison = $criteria->getComparison(ReservationPeer::ID);
+            $value = $criteria->remove(ReservationPeer::ID);
             if ($value) {
-                $selectCriteria->add(DayIntervalPeer::ID, $value, $comparison);
+                $selectCriteria->add(ReservationPeer::ID, $value, $comparison);
             } else {
-                $selectCriteria->setPrimaryTableName(DayIntervalPeer::TABLE_NAME);
+                $selectCriteria->setPrimaryTableName(ReservationPeer::TABLE_NAME);
             }
 
-        } else { // $values is DayInterval object
+        } else { // $values is Reservation object
             $criteria = $values->buildCriteria(); // gets full criteria
             $selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
         }
 
         // set the correct dbName
-        $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+        $criteria->setDbName(ReservationPeer::DATABASE_NAME);
 
         return BasePeer::doUpdate($selectCriteria, $criteria, $con);
     }
 
     /**
-     * Deletes all rows from the day_interval table.
+     * Deletes all rows from the reservation table.
      *
      * @param      PropelPDO $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).
@@ -1237,19 +1536,19 @@ abstract class BaseDayIntervalPeer
     public static function doDeleteAll(PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-            $affectedRows += BasePeer::doDeleteAll(DayIntervalPeer::TABLE_NAME, $con, DayIntervalPeer::DATABASE_NAME);
+            $affectedRows += BasePeer::doDeleteAll(ReservationPeer::TABLE_NAME, $con, ReservationPeer::DATABASE_NAME);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            DayIntervalPeer::clearInstancePool();
-            DayIntervalPeer::clearRelatedInstancePool();
+            ReservationPeer::clearInstancePool();
+            ReservationPeer::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -1260,9 +1559,9 @@ abstract class BaseDayIntervalPeer
     }
 
     /**
-     * Performs a DELETE on the database, given a DayInterval or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a Reservation or Criteria object OR a primary key value.
      *
-     * @param      mixed $values Criteria or DayInterval object or primary key or array of primary keys
+     * @param      mixed $values Criteria or Reservation object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param      PropelPDO $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -1273,32 +1572,32 @@ abstract class BaseDayIntervalPeer
      public static function doDelete($values, PropelPDO $con = null)
      {
         if ($con === null) {
-            $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         if ($values instanceof Criteria) {
             // invalidate the cache for all objects of this type, since we have no
             // way of knowing (without running a query) what objects should be invalidated
             // from the cache based on this Criteria.
-            DayIntervalPeer::clearInstancePool();
+            ReservationPeer::clearInstancePool();
             // rename for clarity
             $criteria = clone $values;
-        } elseif ($values instanceof DayInterval) { // it's a model object
+        } elseif ($values instanceof Reservation) { // it's a model object
             // invalidate the cache for this single object
-            DayIntervalPeer::removeInstanceFromPool($values);
+            ReservationPeer::removeInstanceFromPool($values);
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(DayIntervalPeer::DATABASE_NAME);
-            $criteria->add(DayIntervalPeer::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(ReservationPeer::DATABASE_NAME);
+            $criteria->add(ReservationPeer::ID, (array) $values, Criteria::IN);
             // invalidate the cache for this object(s)
             foreach ((array) $values as $singleval) {
-                DayIntervalPeer::removeInstanceFromPool($singleval);
+                ReservationPeer::removeInstanceFromPool($singleval);
             }
         }
 
         // Set the correct dbName
-        $criteria->setDbName(DayIntervalPeer::DATABASE_NAME);
+        $criteria->setDbName(ReservationPeer::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -1308,7 +1607,7 @@ abstract class BaseDayIntervalPeer
             $con->beginTransaction();
 
             $affectedRows += BasePeer::doDelete($criteria, $con);
-            DayIntervalPeer::clearRelatedInstancePool();
+            ReservationPeer::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -1319,13 +1618,13 @@ abstract class BaseDayIntervalPeer
     }
 
     /**
-     * Validates all modified columns of given DayInterval object.
+     * Validates all modified columns of given Reservation object.
      * If parameter $columns is either a single column name or an array of column names
      * than only those columns are validated.
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param      DayInterval $obj The object to validate.
+     * @param      Reservation $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -1335,8 +1634,8 @@ abstract class BaseDayIntervalPeer
         $columns = array();
 
         if ($cols) {
-            $dbMap = Propel::getDatabaseMap(DayIntervalPeer::DATABASE_NAME);
-            $tableMap = $dbMap->getTable(DayIntervalPeer::TABLE_NAME);
+            $dbMap = Propel::getDatabaseMap(ReservationPeer::DATABASE_NAME);
+            $tableMap = $dbMap->getTable(ReservationPeer::TABLE_NAME);
 
             if (! is_array($cols)) {
                 $cols = array($cols);
@@ -1352,7 +1651,7 @@ abstract class BaseDayIntervalPeer
 
         }
 
-        return BasePeer::doValidate(DayIntervalPeer::DATABASE_NAME, DayIntervalPeer::TABLE_NAME, $columns);
+        return BasePeer::doValidate(ReservationPeer::DATABASE_NAME, ReservationPeer::TABLE_NAME, $columns);
     }
 
     /**
@@ -1360,23 +1659,23 @@ abstract class BaseDayIntervalPeer
      *
      * @param      int $pk the primary key.
      * @param      PropelPDO $con the connection to use
-     * @return DayInterval
+     * @return Reservation
      */
     public static function retrieveByPK($pk, PropelPDO $con = null)
     {
 
-        if (null !== ($obj = DayIntervalPeer::getInstanceFromPool((string) $pk))) {
+        if (null !== ($obj = ReservationPeer::getInstanceFromPool((string) $pk))) {
             return $obj;
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria = new Criteria(DayIntervalPeer::DATABASE_NAME);
-        $criteria->add(DayIntervalPeer::ID, $pk);
+        $criteria = new Criteria(ReservationPeer::DATABASE_NAME);
+        $criteria->add(ReservationPeer::ID, $pk);
 
-        $v = DayIntervalPeer::doSelect($criteria, $con);
+        $v = ReservationPeer::doSelect($criteria, $con);
 
         return !empty($v) > 0 ? $v[0] : null;
     }
@@ -1386,31 +1685,31 @@ abstract class BaseDayIntervalPeer
      *
      * @param      array $pks List of primary keys
      * @param      PropelPDO $con the connection to use
-     * @return DayInterval[]
+     * @return Reservation[]
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
     public static function retrieveByPKs($pks, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(DayIntervalPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         $objs = null;
         if (empty($pks)) {
             $objs = array();
         } else {
-            $criteria = new Criteria(DayIntervalPeer::DATABASE_NAME);
-            $criteria->add(DayIntervalPeer::ID, $pks, Criteria::IN);
-            $objs = DayIntervalPeer::doSelect($criteria, $con);
+            $criteria = new Criteria(ReservationPeer::DATABASE_NAME);
+            $criteria->add(ReservationPeer::ID, $pks, Criteria::IN);
+            $objs = ReservationPeer::doSelect($criteria, $con);
         }
 
         return $objs;
     }
 
-} // BaseDayIntervalPeer
+} // BaseReservationPeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BaseDayIntervalPeer::buildTableMap();
+BaseReservationPeer::buildTableMap();
 

@@ -18,6 +18,8 @@ use RMT\TimeScheduling\Model\DayInterval;
 use RMT\TimeScheduling\Model\DayIntervalQuery;
 use RMT\TimeScheduling\Model\DayPeer;
 use RMT\TimeScheduling\Model\DayQuery;
+use RMT\TimeScheduling\Model\Reservation;
+use RMT\TimeScheduling\Model\ReservationQuery;
 
 abstract class BaseDay extends BaseObject implements Persistent
 {
@@ -53,6 +55,12 @@ abstract class BaseDay extends BaseObject implements Persistent
     protected $value;
 
     /**
+     * @var        PropelObjectCollection|Reservation[] Collection to store aggregation of Reservation objects.
+     */
+    protected $collReservations;
+    protected $collReservationsPartial;
+
+    /**
      * @var        PropelObjectCollection|DayInterval[] Collection to store aggregation of DayInterval objects.
      */
     protected $collDayIntervals;
@@ -71,6 +79,18 @@ abstract class BaseDay extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
+
+    /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $reservationsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -106,7 +126,7 @@ abstract class BaseDay extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -127,7 +147,7 @@ abstract class BaseDay extends BaseObject implements Persistent
      */
     public function setValue($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -181,7 +201,7 @@ abstract class BaseDay extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 2; // 2 = DayPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -243,6 +263,8 @@ abstract class BaseDay extends BaseObject implements Persistent
         $this->hydrate($row, 0, true); // rehydrate
 
         if ($deep) {  // also de-associate any related objects?
+
+            $this->collReservations = null;
 
             $this->collDayIntervals = null;
 
@@ -370,6 +392,24 @@ abstract class BaseDay extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
+            if ($this->reservationsScheduledForDeletion !== null) {
+                if (!$this->reservationsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->reservationsScheduledForDeletion as $reservation) {
+                        // need to save related object because we set the relation to null
+                        $reservation->save($con);
+                    }
+                    $this->reservationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collReservations !== null) {
+                foreach ($this->collReservations as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->dayIntervalsScheduledForDeletion !== null) {
                 if (!$this->dayIntervalsScheduledForDeletion->isEmpty()) {
                     foreach ($this->dayIntervalsScheduledForDeletion as $dayInterval) {
@@ -382,7 +422,7 @@ abstract class BaseDay extends BaseObject implements Persistent
 
             if ($this->collDayIntervals !== null) {
                 foreach ($this->collDayIntervals as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -415,10 +455,10 @@ abstract class BaseDay extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(DayPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(DayPeer::VALUE)) {
-            $modifiedColumns[':p' . $index++]  = '`VALUE`';
+            $modifiedColumns[':p' . $index++]  = '`value`';
         }
 
         $sql = sprintf(
@@ -431,10 +471,10 @@ abstract class BaseDay extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`VALUE`':
+                    case '`value`':
                         $stmt->bindValue($identifier, $this->value, PDO::PARAM_STR);
                         break;
                 }
@@ -505,11 +545,11 @@ abstract class BaseDay extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -535,6 +575,14 @@ abstract class BaseDay extends BaseObject implements Persistent
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collReservations !== null) {
+                    foreach ($this->collReservations as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
                 if ($this->collDayIntervals !== null) {
                     foreach ($this->collDayIntervals as $referrerFK) {
@@ -618,6 +666,9 @@ abstract class BaseDay extends BaseObject implements Persistent
             $keys[1] => $this->getValue(),
         );
         if ($includeForeignObjects) {
+            if (null !== $this->collReservations) {
+                $result['Reservations'] = $this->collReservations->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collDayIntervals) {
                 $result['DayIntervals'] = $this->collDayIntervals->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -772,6 +823,12 @@ abstract class BaseDay extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
+            foreach ($this->getReservations() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addReservation($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getDayIntervals() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addDayInterval($relObj->copy($deepCopy));
@@ -839,9 +896,280 @@ abstract class BaseDay extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
+        if ('Reservation' == $relationName) {
+            $this->initReservations();
+        }
         if ('DayInterval' == $relationName) {
             $this->initDayIntervals();
         }
+    }
+
+    /**
+     * Clears out the collReservations collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Day The current object (for fluent API support)
+     * @see        addReservations()
+     */
+    public function clearReservations()
+    {
+        $this->collReservations = null; // important to set this to null since that means it is uninitialized
+        $this->collReservationsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collReservations collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialReservations($v = true)
+    {
+        $this->collReservationsPartial = $v;
+    }
+
+    /**
+     * Initializes the collReservations collection.
+     *
+     * By default this just sets the collReservations collection to an empty array (like clearcollReservations());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initReservations($overrideExisting = true)
+    {
+        if (null !== $this->collReservations && !$overrideExisting) {
+            return;
+        }
+        $this->collReservations = new PropelObjectCollection();
+        $this->collReservations->setModel('Reservation');
+    }
+
+    /**
+     * Gets an array of Reservation objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Day is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Reservation[] List of Reservation objects
+     * @throws PropelException
+     */
+    public function getReservations($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collReservationsPartial && !$this->isNew();
+        if (null === $this->collReservations || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collReservations) {
+                // return empty collection
+                $this->initReservations();
+            } else {
+                $collReservations = ReservationQuery::create(null, $criteria)
+                    ->filterByDay($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collReservationsPartial && count($collReservations)) {
+                      $this->initReservations(false);
+
+                      foreach($collReservations as $obj) {
+                        if (false == $this->collReservations->contains($obj)) {
+                          $this->collReservations->append($obj);
+                        }
+                      }
+
+                      $this->collReservationsPartial = true;
+                    }
+
+                    $collReservations->getInternalIterator()->rewind();
+                    return $collReservations;
+                }
+
+                if($partial && $this->collReservations) {
+                    foreach($this->collReservations as $obj) {
+                        if($obj->isNew()) {
+                            $collReservations[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collReservations = $collReservations;
+                $this->collReservationsPartial = false;
+            }
+        }
+
+        return $this->collReservations;
+    }
+
+    /**
+     * Sets a collection of Reservation objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $reservations A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Day The current object (for fluent API support)
+     */
+    public function setReservations(PropelCollection $reservations, PropelPDO $con = null)
+    {
+        $reservationsToDelete = $this->getReservations(new Criteria(), $con)->diff($reservations);
+
+        $this->reservationsScheduledForDeletion = unserialize(serialize($reservationsToDelete));
+
+        foreach ($reservationsToDelete as $reservationRemoved) {
+            $reservationRemoved->setDay(null);
+        }
+
+        $this->collReservations = null;
+        foreach ($reservations as $reservation) {
+            $this->addReservation($reservation);
+        }
+
+        $this->collReservations = $reservations;
+        $this->collReservationsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Reservation objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Reservation objects.
+     * @throws PropelException
+     */
+    public function countReservations(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collReservationsPartial && !$this->isNew();
+        if (null === $this->collReservations || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collReservations) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getReservations());
+            }
+            $query = ReservationQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByDay($this)
+                ->count($con);
+        }
+
+        return count($this->collReservations);
+    }
+
+    /**
+     * Method called to associate a Reservation object to this object
+     * through the Reservation foreign key attribute.
+     *
+     * @param    Reservation $l Reservation
+     * @return Day The current object (for fluent API support)
+     */
+    public function addReservation(Reservation $l)
+    {
+        if ($this->collReservations === null) {
+            $this->initReservations();
+            $this->collReservationsPartial = true;
+        }
+        if (!in_array($l, $this->collReservations->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddReservation($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Reservation $reservation The reservation object to add.
+     */
+    protected function doAddReservation($reservation)
+    {
+        $this->collReservations[]= $reservation;
+        $reservation->setDay($this);
+    }
+
+    /**
+     * @param	Reservation $reservation The reservation object to remove.
+     * @return Day The current object (for fluent API support)
+     */
+    public function removeReservation($reservation)
+    {
+        if ($this->getReservations()->contains($reservation)) {
+            $this->collReservations->remove($this->collReservations->search($reservation));
+            if (null === $this->reservationsScheduledForDeletion) {
+                $this->reservationsScheduledForDeletion = clone $this->collReservations;
+                $this->reservationsScheduledForDeletion->clear();
+            }
+            $this->reservationsScheduledForDeletion[]= $reservation;
+            $reservation->setDay(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Day is new, it will return
+     * an empty collection; or if this Day has previously
+     * been saved, it will retrieve related Reservations from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Day.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Reservation[] List of Reservation objects
+     */
+    public function getReservationsJoinUserRelatedByReserveeUserId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = ReservationQuery::create(null, $criteria);
+        $query->joinWith('UserRelatedByReserveeUserId', $join_behavior);
+
+        return $this->getReservations($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Day is new, it will return
+     * an empty collection; or if this Day has previously
+     * been saved, it will retrieve related Reservations from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Day.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Reservation[] List of Reservation objects
+     */
+    public function getReservationsJoinUserRelatedByReserverUserId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = ReservationQuery::create(null, $criteria);
+        $query->joinWith('UserRelatedByReserverUserId', $join_behavior);
+
+        return $this->getReservations($query, $con);
     }
 
     /**
@@ -850,13 +1178,15 @@ abstract class BaseDay extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Day The current object (for fluent API support)
      * @see        addDayIntervals()
      */
     public function clearDayIntervals()
     {
         $this->collDayIntervals = null; // important to set this to null since that means it is uninitialized
         $this->collDayIntervalsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -928,6 +1258,7 @@ abstract class BaseDay extends BaseObject implements Persistent
                       $this->collDayIntervalsPartial = true;
                     }
 
+                    $collDayIntervals->getInternalIterator()->rewind();
                     return $collDayIntervals;
                 }
 
@@ -955,12 +1286,15 @@ abstract class BaseDay extends BaseObject implements Persistent
      *
      * @param PropelCollection $dayIntervals A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Day The current object (for fluent API support)
      */
     public function setDayIntervals(PropelCollection $dayIntervals, PropelPDO $con = null)
     {
-        $this->dayIntervalsScheduledForDeletion = $this->getDayIntervals(new Criteria(), $con)->diff($dayIntervals);
+        $dayIntervalsToDelete = $this->getDayIntervals(new Criteria(), $con)->diff($dayIntervals);
 
-        foreach ($this->dayIntervalsScheduledForDeletion as $dayIntervalRemoved) {
+        $this->dayIntervalsScheduledForDeletion = unserialize(serialize($dayIntervalsToDelete));
+
+        foreach ($dayIntervalsToDelete as $dayIntervalRemoved) {
             $dayIntervalRemoved->setDay(null);
         }
 
@@ -971,6 +1305,8 @@ abstract class BaseDay extends BaseObject implements Persistent
 
         $this->collDayIntervals = $dayIntervals;
         $this->collDayIntervalsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -988,22 +1324,22 @@ abstract class BaseDay extends BaseObject implements Persistent
         if (null === $this->collDayIntervals || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collDayIntervals) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getDayIntervals());
-                }
-                $query = DayIntervalQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByDay($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collDayIntervals);
+
+            if($partial && !$criteria) {
+                return count($this->getDayIntervals());
+            }
+            $query = DayIntervalQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByDay($this)
+                ->count($con);
         }
+
+        return count($this->collDayIntervals);
     }
 
     /**
@@ -1019,7 +1355,7 @@ abstract class BaseDay extends BaseObject implements Persistent
             $this->initDayIntervals();
             $this->collDayIntervalsPartial = true;
         }
-        if (!$this->collDayIntervals->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collDayIntervals->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddDayInterval($l);
         }
 
@@ -1037,6 +1373,7 @@ abstract class BaseDay extends BaseObject implements Persistent
 
     /**
      * @param	DayInterval $dayInterval The dayInterval object to remove.
+     * @return Day The current object (for fluent API support)
      */
     public function removeDayInterval($dayInterval)
     {
@@ -1049,6 +1386,8 @@ abstract class BaseDay extends BaseObject implements Persistent
             $this->dayIntervalsScheduledForDeletion[]= $dayInterval;
             $dayInterval->setDay(null);
         }
+
+        return $this;
     }
 
 
@@ -1085,6 +1424,7 @@ abstract class BaseDay extends BaseObject implements Persistent
         $this->value = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1102,14 +1442,26 @@ abstract class BaseDay extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->collReservations) {
+                foreach ($this->collReservations as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collDayIntervals) {
                 foreach ($this->collDayIntervals as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
+        if ($this->collReservations instanceof PropelCollection) {
+            $this->collReservations->clearIterator();
+        }
+        $this->collReservations = null;
         if ($this->collDayIntervals instanceof PropelCollection) {
             $this->collDayIntervals->clearIterator();
         }

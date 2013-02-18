@@ -42,8 +42,8 @@ class DayTableMap extends TableMap
         $this->setPackage('src.RMT.TimeScheduling.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('VALUE', 'Value', 'VARCHAR', false, 255, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('value', 'Value', 'VARCHAR', false, 255, null);
         // validators
     } // initialize()
 
@@ -52,6 +52,7 @@ class DayTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Reservation', 'RMT\\TimeScheduling\\Model\\Reservation', RelationMap::ONE_TO_MANY, array('id' => 'day_id', ), null, null, 'Reservations');
         $this->addRelation('DayInterval', 'RMT\\TimeScheduling\\Model\\DayInterval', RelationMap::ONE_TO_MANY, array('id' => 'day_id', ), null, null, 'DayIntervals');
     } // buildRelations()
 
