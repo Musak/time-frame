@@ -1,1 +1,5 @@
-Hello {{ name }}!
+<form action="{{ path('rmt_time_scheduling_reservations') }}" method="post" {{ form_enctype(form) }}>
+    {{ form_widget(form) }}
+
+    <input type="submit" />
+</form>
