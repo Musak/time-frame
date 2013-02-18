@@ -27,7 +27,7 @@ class AppKernel extends Kernel
             new Craue\FormFlowBundle\CraueFormFlowBundle(),
             new RMT\UserManagment\UserBundle\RMTUserManagmentUserBundle(),
             new RMT\TimeScheduling\WorkingHoursBundle\RMTTimeSchedulingWorkingHoursBundle(),
-            new RMT\TimeScheduling\HourReservationsBundle\RMTTimeSchedulingHourReservationsBundle(),
+            new RMT\TimeScheduling\ReservationsBundle\RMTTimeSchedulingReservationsBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

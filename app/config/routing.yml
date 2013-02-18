@@ -1,5 +1,5 @@
-rmt_time_scheduling_hour_reservations:
-    resource: "@RMTTimeSchedulingHourReservationsBundle/Resources/config/routing.yml"
+rmt_time_scheduling_reservations:
+    resource: "@RMTTimeSchedulingReservationsBundle/Resources/config/routing.yml"
     prefix:   /
 
 rmt_user_managment_user:

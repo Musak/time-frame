@@ -1,7 +1,0 @@
-parameters:
-#    rmt_time_scheduling_hour_reservations.example.class: RMT\TimeScheduling\HourReservationsBundle\Example
-
-services:
-#    rmt_time_scheduling_hour_reservations.example:
-#        class: %rmt_time_scheduling_hour_reservations.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]

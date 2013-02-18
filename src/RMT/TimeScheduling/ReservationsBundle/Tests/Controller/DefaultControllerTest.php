@@ -1,6 +1,6 @@
 <?php
 
-namespace RMT\TimeScheduling\HourReservationsBundle\Tests\Controller;
+namespace RMT\TimeScheduling\ReservationsBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

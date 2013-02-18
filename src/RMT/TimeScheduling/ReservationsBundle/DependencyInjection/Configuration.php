@@ -1,6 +1,6 @@
 <?php
 
-namespace RMT\TimeScheduling\HourReservationsBundle\DependencyInjection;
+namespace RMT\TimeScheduling\ReservationsBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -18,7 +18,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('rmt_time_scheduling_hour_reservations');
+        $rootNode = $treeBuilder->root('rmt_time_scheduling_reservations');
 
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for

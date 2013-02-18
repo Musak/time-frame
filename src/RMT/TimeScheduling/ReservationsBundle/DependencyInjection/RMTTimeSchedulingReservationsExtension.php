@@ -1,6 +1,6 @@
 <?php
 
-namespace RMT\TimeScheduling\HourReservationsBundle\DependencyInjection;
+namespace RMT\TimeScheduling\ReservationsBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Loader;
  *
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
  */
-class RMTTimeSchedulingHourReservationsExtension extends Extension
+class RMTTimeSchedulingReservationsExtension extends Extension
 {
     /**
      * {@inheritDoc}
