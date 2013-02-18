@@ -1,3 +1,7 @@
+rmt_time_scheduling_hour_reservations:
+    resource: "@RMTTimeSchedulingHourReservationsBundle/Resources/config/routing.yml"
+    prefix:   /
+
 rmt_user_managment_user:
     resource: "@RMTUserManagmentUserBundle/Controller/"
     type:     annotation
