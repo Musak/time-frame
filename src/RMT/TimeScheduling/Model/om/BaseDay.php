@@ -1139,10 +1139,10 @@ abstract class BaseDay extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Reservation[] List of Reservation objects
      */
-    public function getReservationsJoinReservee($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getReservationsJoinClient($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = ReservationQuery::create(null, $criteria);
-        $query->joinWith('Reservee', $join_behavior);
+        $query->joinWith('Client', $join_behavior);
 
         return $this->getReservations($query, $con);
     }

@@ -42,8 +42,8 @@ abstract class BaseReservationPeer
     /** the column name for the id field */
     const ID = 'reservation.id';
 
-    /** the column name for the reservee_user_id field */
-    const RESERVEE_USER_ID = 'reservation.reservee_user_id';
+    /** the column name for the client_user_id field */
+    const CLIENT_USER_ID = 'reservation.client_user_id';
 
     /** the column name for the reserver_user_id field */
     const RESERVER_USER_ID = 'reservation.reserver_user_id';
@@ -76,11 +76,11 @@ abstract class BaseReservationPeer
      * e.g. ReservationPeer::$fieldNames[ReservationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'ReserveeUserId', 'ReserverUserId', 'DayId', 'StartTime', 'EndTime', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'reserveeUserId', 'reserverUserId', 'dayId', 'startTime', 'endTime', ),
-        BasePeer::TYPE_COLNAME => array (ReservationPeer::ID, ReservationPeer::RESERVEE_USER_ID, ReservationPeer::RESERVER_USER_ID, ReservationPeer::DAY_ID, ReservationPeer::START_TIME, ReservationPeer::END_TIME, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'RESERVEE_USER_ID', 'RESERVER_USER_ID', 'DAY_ID', 'START_TIME', 'END_TIME', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'reservee_user_id', 'reserver_user_id', 'day_id', 'start_time', 'end_time', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'ClientUserId', 'ReserverUserId', 'DayId', 'StartTime', 'EndTime', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'clientUserId', 'reserverUserId', 'dayId', 'startTime', 'endTime', ),
+        BasePeer::TYPE_COLNAME => array (ReservationPeer::ID, ReservationPeer::CLIENT_USER_ID, ReservationPeer::RESERVER_USER_ID, ReservationPeer::DAY_ID, ReservationPeer::START_TIME, ReservationPeer::END_TIME, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'CLIENT_USER_ID', 'RESERVER_USER_ID', 'DAY_ID', 'START_TIME', 'END_TIME', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'client_user_id', 'reserver_user_id', 'day_id', 'start_time', 'end_time', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
@@ -91,11 +91,11 @@ abstract class BaseReservationPeer
      * e.g. ReservationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ReserveeUserId' => 1, 'ReserverUserId' => 2, 'DayId' => 3, 'StartTime' => 4, 'EndTime' => 5, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'reserveeUserId' => 1, 'reserverUserId' => 2, 'dayId' => 3, 'startTime' => 4, 'endTime' => 5, ),
-        BasePeer::TYPE_COLNAME => array (ReservationPeer::ID => 0, ReservationPeer::RESERVEE_USER_ID => 1, ReservationPeer::RESERVER_USER_ID => 2, ReservationPeer::DAY_ID => 3, ReservationPeer::START_TIME => 4, ReservationPeer::END_TIME => 5, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'RESERVEE_USER_ID' => 1, 'RESERVER_USER_ID' => 2, 'DAY_ID' => 3, 'START_TIME' => 4, 'END_TIME' => 5, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'reservee_user_id' => 1, 'reserver_user_id' => 2, 'day_id' => 3, 'start_time' => 4, 'end_time' => 5, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ClientUserId' => 1, 'ReserverUserId' => 2, 'DayId' => 3, 'StartTime' => 4, 'EndTime' => 5, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'clientUserId' => 1, 'reserverUserId' => 2, 'dayId' => 3, 'startTime' => 4, 'endTime' => 5, ),
+        BasePeer::TYPE_COLNAME => array (ReservationPeer::ID => 0, ReservationPeer::CLIENT_USER_ID => 1, ReservationPeer::RESERVER_USER_ID => 2, ReservationPeer::DAY_ID => 3, ReservationPeer::START_TIME => 4, ReservationPeer::END_TIME => 5, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'CLIENT_USER_ID' => 1, 'RESERVER_USER_ID' => 2, 'DAY_ID' => 3, 'START_TIME' => 4, 'END_TIME' => 5, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'client_user_id' => 1, 'reserver_user_id' => 2, 'day_id' => 3, 'start_time' => 4, 'end_time' => 5, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
@@ -171,14 +171,14 @@ abstract class BaseReservationPeer
     {
         if (null === $alias) {
             $criteria->addSelectColumn(ReservationPeer::ID);
-            $criteria->addSelectColumn(ReservationPeer::RESERVEE_USER_ID);
+            $criteria->addSelectColumn(ReservationPeer::CLIENT_USER_ID);
             $criteria->addSelectColumn(ReservationPeer::RESERVER_USER_ID);
             $criteria->addSelectColumn(ReservationPeer::DAY_ID);
             $criteria->addSelectColumn(ReservationPeer::START_TIME);
             $criteria->addSelectColumn(ReservationPeer::END_TIME);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.reservee_user_id');
+            $criteria->addSelectColumn($alias . '.client_user_id');
             $criteria->addSelectColumn($alias . '.reserver_user_id');
             $criteria->addSelectColumn($alias . '.day_id');
             $criteria->addSelectColumn($alias . '.start_time');
@@ -487,7 +487,7 @@ abstract class BaseReservationPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Reservee table
+     * Returns the number of rows matching criteria, joining the related Client table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -495,7 +495,7 @@ abstract class BaseReservationPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinReservee(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinClient(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -522,7 +522,7 @@ abstract class BaseReservationPeer
             $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(ReservationPeer::RESERVEE_USER_ID, UserPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::CLIENT_USER_ID, UserPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -648,7 +648,7 @@ abstract class BaseReservationPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinReservee(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinClient(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -661,7 +661,7 @@ abstract class BaseReservationPeer
         $startcol = ReservationPeer::NUM_HYDRATE_COLUMNS;
         UserPeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(ReservationPeer::RESERVEE_USER_ID, UserPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::CLIENT_USER_ID, UserPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -694,7 +694,7 @@ abstract class BaseReservationPeer
                 } // if obj2 already loaded
 
                 // Add the $obj1 (Reservation) to $obj2 (User)
-                $obj2->addReservationRelatedByReserveeUserId($obj1);
+                $obj2->addReservationRelatedByClientUserId($obj1);
 
             } // if joined row was not null
 
@@ -876,7 +876,7 @@ abstract class BaseReservationPeer
             $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(ReservationPeer::RESERVEE_USER_ID, UserPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::CLIENT_USER_ID, UserPeer::ID, $join_behavior);
 
         $criteria->addJoin(ReservationPeer::RESERVER_USER_ID, UserPeer::ID, $join_behavior);
 
@@ -925,7 +925,7 @@ abstract class BaseReservationPeer
         DayPeer::addSelectColumns($criteria);
         $startcol5 = $startcol4 + DayPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(ReservationPeer::RESERVEE_USER_ID, UserPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::CLIENT_USER_ID, UserPeer::ID, $join_behavior);
 
         $criteria->addJoin(ReservationPeer::RESERVER_USER_ID, UserPeer::ID, $join_behavior);
 
@@ -963,7 +963,7 @@ abstract class BaseReservationPeer
                 } // if obj2 loaded
 
                 // Add the $obj1 (Reservation) to the collection in $obj2 (User)
-                $obj2->addReservationRelatedByReserveeUserId($obj1);
+                $obj2->addReservationRelatedByClientUserId($obj1);
             } // if joined row not null
 
             // Add objects for joined User rows
@@ -1011,7 +1011,7 @@ abstract class BaseReservationPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Reservee table
+     * Returns the number of rows matching criteria, joining the related Client table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -1019,7 +1019,7 @@ abstract class BaseReservationPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAllExceptReservee(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinAllExceptClient(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -1148,7 +1148,7 @@ abstract class BaseReservationPeer
             $con = Propel::getConnection(ReservationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(ReservationPeer::RESERVEE_USER_ID, UserPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::CLIENT_USER_ID, UserPeer::ID, $join_behavior);
 
         $criteria->addJoin(ReservationPeer::RESERVER_USER_ID, UserPeer::ID, $join_behavior);
 
@@ -1166,7 +1166,7 @@ abstract class BaseReservationPeer
 
 
     /**
-     * Selects a collection of Reservation objects pre-filled with all related objects except Reservee.
+     * Selects a collection of Reservation objects pre-filled with all related objects except Client.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -1175,7 +1175,7 @@ abstract class BaseReservationPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptReservee(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptClient(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -1343,7 +1343,7 @@ abstract class BaseReservationPeer
         UserPeer::addSelectColumns($criteria);
         $startcol4 = $startcol3 + UserPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(ReservationPeer::RESERVEE_USER_ID, UserPeer::ID, $join_behavior);
+        $criteria->addJoin(ReservationPeer::CLIENT_USER_ID, UserPeer::ID, $join_behavior);
 
         $criteria->addJoin(ReservationPeer::RESERVER_USER_ID, UserPeer::ID, $join_behavior);
 
@@ -1380,7 +1380,7 @@ abstract class BaseReservationPeer
                 } // if $obj2 already loaded
 
                 // Add the $obj1 (Reservation) to the collection in $obj2 (User)
-                $obj2->addReservationRelatedByReserveeUserId($obj1);
+                $obj2->addReservationRelatedByClientUserId($obj1);
 
             } // if joined row is not null
 

@@ -49,10 +49,10 @@ abstract class BaseReservation extends BaseObject implements Persistent
     protected $id;
 
     /**
-     * The value for the reservee_user_id field.
+     * The value for the client_user_id field.
      * @var        int
      */
-    protected $reservee_user_id;
+    protected $client_user_id;
 
     /**
      * The value for the reserver_user_id field.
@@ -81,7 +81,7 @@ abstract class BaseReservation extends BaseObject implements Persistent
     /**
      * @var        User
      */
-    protected $aReservee;
+    protected $aClient;
 
     /**
      * @var        User
@@ -124,13 +124,13 @@ abstract class BaseReservation extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [reservee_user_id] column value.
+     * Get the [client_user_id] column value.
      *
      * @return int
      */
-    public function getReserveeUserId()
+    public function getClientUserId()
     {
-        return $this->reservee_user_id;
+        return $this->client_user_id;
     }
 
     /**
@@ -245,29 +245,29 @@ abstract class BaseReservation extends BaseObject implements Persistent
     } // setId()
 
     /**
-     * Set the value of [reservee_user_id] column.
+     * Set the value of [client_user_id] column.
      *
      * @param int $v new value
      * @return Reservation The current object (for fluent API support)
      */
-    public function setReserveeUserId($v)
+    public function setClientUserId($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
-        if ($this->reservee_user_id !== $v) {
-            $this->reservee_user_id = $v;
-            $this->modifiedColumns[] = ReservationPeer::RESERVEE_USER_ID;
+        if ($this->client_user_id !== $v) {
+            $this->client_user_id = $v;
+            $this->modifiedColumns[] = ReservationPeer::CLIENT_USER_ID;
         }
 
-        if ($this->aReservee !== null && $this->aReservee->getId() !== $v) {
-            $this->aReservee = null;
+        if ($this->aClient !== null && $this->aClient->getId() !== $v) {
+            $this->aClient = null;
         }
 
 
         return $this;
-    } // setReserveeUserId()
+    } // setClientUserId()
 
     /**
      * Set the value of [reserver_user_id] column.
@@ -398,7 +398,7 @@ abstract class BaseReservation extends BaseObject implements Persistent
         try {
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->reservee_user_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->client_user_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
             $this->reserver_user_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->day_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
             $this->start_time = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
@@ -434,8 +434,8 @@ abstract class BaseReservation extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aReservee !== null && $this->reservee_user_id !== $this->aReservee->getId()) {
-            $this->aReservee = null;
+        if ($this->aClient !== null && $this->client_user_id !== $this->aClient->getId()) {
+            $this->aClient = null;
         }
         if ($this->aReserver !== null && $this->reserver_user_id !== $this->aReserver->getId()) {
             $this->aReserver = null;
@@ -482,7 +482,7 @@ abstract class BaseReservation extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aReservee = null;
+            $this->aClient = null;
             $this->aReserver = null;
             $this->aDay = null;
         } // if (deep)
@@ -603,11 +603,11 @@ abstract class BaseReservation extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aReservee !== null) {
-                if ($this->aReservee->isModified() || $this->aReservee->isNew()) {
-                    $affectedRows += $this->aReservee->save($con);
+            if ($this->aClient !== null) {
+                if ($this->aClient->isModified() || $this->aClient->isNew()) {
+                    $affectedRows += $this->aClient->save($con);
                 }
-                $this->setReservee($this->aReservee);
+                $this->setClient($this->aClient);
             }
 
             if ($this->aReserver !== null) {
@@ -664,8 +664,8 @@ abstract class BaseReservation extends BaseObject implements Persistent
         if ($this->isColumnModified(ReservationPeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '`id`';
         }
-        if ($this->isColumnModified(ReservationPeer::RESERVEE_USER_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`reservee_user_id`';
+        if ($this->isColumnModified(ReservationPeer::CLIENT_USER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`client_user_id`';
         }
         if ($this->isColumnModified(ReservationPeer::RESERVER_USER_ID)) {
             $modifiedColumns[':p' . $index++]  = '`reserver_user_id`';
@@ -693,8 +693,8 @@ abstract class BaseReservation extends BaseObject implements Persistent
                     case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`reservee_user_id`':
-                        $stmt->bindValue($identifier, $this->reservee_user_id, PDO::PARAM_INT);
+                    case '`client_user_id`':
+                        $stmt->bindValue($identifier, $this->client_user_id, PDO::PARAM_INT);
                         break;
                     case '`reserver_user_id`':
                         $stmt->bindValue($identifier, $this->reserver_user_id, PDO::PARAM_INT);
@@ -807,9 +807,9 @@ abstract class BaseReservation extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aReservee !== null) {
-                if (!$this->aReservee->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aReservee->getValidationFailures());
+            if ($this->aClient !== null) {
+                if (!$this->aClient->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aClient->getValidationFailures());
                 }
             }
 
@@ -870,7 +870,7 @@ abstract class BaseReservation extends BaseObject implements Persistent
                 return $this->getId();
                 break;
             case 1:
-                return $this->getReserveeUserId();
+                return $this->getClientUserId();
                 break;
             case 2:
                 return $this->getReserverUserId();
@@ -914,15 +914,15 @@ abstract class BaseReservation extends BaseObject implements Persistent
         $keys = ReservationPeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getReserveeUserId(),
+            $keys[1] => $this->getClientUserId(),
             $keys[2] => $this->getReserverUserId(),
             $keys[3] => $this->getDayId(),
             $keys[4] => $this->getStartTime(),
             $keys[5] => $this->getEndTime(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aReservee) {
-                $result['Reservee'] = $this->aReservee->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aClient) {
+                $result['Client'] = $this->aClient->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aReserver) {
                 $result['Reserver'] = $this->aReserver->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -968,7 +968,7 @@ abstract class BaseReservation extends BaseObject implements Persistent
                 $this->setId($value);
                 break;
             case 1:
-                $this->setReserveeUserId($value);
+                $this->setClientUserId($value);
                 break;
             case 2:
                 $this->setReserverUserId($value);
@@ -1007,7 +1007,7 @@ abstract class BaseReservation extends BaseObject implements Persistent
         $keys = ReservationPeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setReserveeUserId($arr[$keys[1]]);
+        if (array_key_exists($keys[1], $arr)) $this->setClientUserId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setReserverUserId($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setDayId($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setStartTime($arr[$keys[4]]);
@@ -1024,7 +1024,7 @@ abstract class BaseReservation extends BaseObject implements Persistent
         $criteria = new Criteria(ReservationPeer::DATABASE_NAME);
 
         if ($this->isColumnModified(ReservationPeer::ID)) $criteria->add(ReservationPeer::ID, $this->id);
-        if ($this->isColumnModified(ReservationPeer::RESERVEE_USER_ID)) $criteria->add(ReservationPeer::RESERVEE_USER_ID, $this->reservee_user_id);
+        if ($this->isColumnModified(ReservationPeer::CLIENT_USER_ID)) $criteria->add(ReservationPeer::CLIENT_USER_ID, $this->client_user_id);
         if ($this->isColumnModified(ReservationPeer::RESERVER_USER_ID)) $criteria->add(ReservationPeer::RESERVER_USER_ID, $this->reserver_user_id);
         if ($this->isColumnModified(ReservationPeer::DAY_ID)) $criteria->add(ReservationPeer::DAY_ID, $this->day_id);
         if ($this->isColumnModified(ReservationPeer::START_TIME)) $criteria->add(ReservationPeer::START_TIME, $this->start_time);
@@ -1092,7 +1092,7 @@ abstract class BaseReservation extends BaseObject implements Persistent
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setReserveeUserId($this->getReserveeUserId());
+        $copyObj->setClientUserId($this->getClientUserId());
         $copyObj->setReserverUserId($this->getReserverUserId());
         $copyObj->setDayId($this->getDayId());
         $copyObj->setStartTime($this->getStartTime());
@@ -1162,20 +1162,20 @@ abstract class BaseReservation extends BaseObject implements Persistent
      * @return Reservation The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setReservee(User $v = null)
+    public function setClient(User $v = null)
     {
         if ($v === null) {
-            $this->setReserveeUserId(NULL);
+            $this->setClientUserId(NULL);
         } else {
-            $this->setReserveeUserId($v->getId());
+            $this->setClientUserId($v->getId());
         }
 
-        $this->aReservee = $v;
+        $this->aClient = $v;
 
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the User object, it will not be re-added.
         if ($v !== null) {
-            $v->addReservationRelatedByReserveeUserId($this);
+            $v->addReservationRelatedByClientUserId($this);
         }
 
 
@@ -1191,20 +1191,20 @@ abstract class BaseReservation extends BaseObject implements Persistent
      * @return User The associated User object.
      * @throws PropelException
      */
-    public function getReservee(PropelPDO $con = null, $doQuery = true)
+    public function getClient(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aReservee === null && ($this->reservee_user_id !== null) && $doQuery) {
-            $this->aReservee = UserQuery::create()->findPk($this->reservee_user_id, $con);
+        if ($this->aClient === null && ($this->client_user_id !== null) && $doQuery) {
+            $this->aClient = UserQuery::create()->findPk($this->client_user_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aReservee->addReservationsRelatedByReserveeUserId($this);
+                $this->aClient->addReservationsRelatedByClientUserId($this);
              */
         }
 
-        return $this->aReservee;
+        return $this->aClient;
     }
 
     /**
@@ -1317,7 +1317,7 @@ abstract class BaseReservation extends BaseObject implements Persistent
     public function clear()
     {
         $this->id = null;
-        $this->reservee_user_id = null;
+        $this->client_user_id = null;
         $this->reserver_user_id = null;
         $this->day_id = null;
         $this->start_time = null;
@@ -1344,8 +1344,8 @@ abstract class BaseReservation extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->aReservee instanceof Persistent) {
-              $this->aReservee->clearAllReferences($deep);
+            if ($this->aClient instanceof Persistent) {
+              $this->aClient->clearAllReferences($deep);
             }
             if ($this->aReserver instanceof Persistent) {
               $this->aReserver->clearAllReferences($deep);
@@ -1357,7 +1357,7 @@ abstract class BaseReservation extends BaseObject implements Persistent
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        $this->aReservee = null;
+        $this->aClient = null;
         $this->aReserver = null;
         $this->aDay = null;
     }

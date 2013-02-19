@@ -20,7 +20,7 @@ class DefaultController extends Controller
     	{
     		$form->bindRequest($request);
             if ($form->isValid()) {
-                $reservation->setReservee($user);
+                $reservation->setClient($user);
             	$reservation->save();
             }
     	}
