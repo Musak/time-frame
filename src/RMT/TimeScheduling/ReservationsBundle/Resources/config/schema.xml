@@ -8,9 +8,9 @@
         <foreign-key foreignTable="fos_user" phpName="Client">
             <reference local="client_user_id" foreign="id" />
         </foreign-key>
-        <column name="reserver_user_id" type="integer" required="true" />
-        <foreign-key foreignTable="fos_user" phpName="Reserver">
-            <reference local="reserver_user_id" foreign="id" />
+        <column name="service_provider_user_id" type="integer" required="true" />
+        <foreign-key foreignTable="fos_user" phpName="ServiceProvider">
+            <reference local="service_provider_user_id" foreign="id" />
         </foreign-key>
     	<column name="day_id" type="integer" />
     	<foreign-key foreignTable="day">

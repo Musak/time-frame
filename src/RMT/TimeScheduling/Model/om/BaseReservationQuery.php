@@ -21,14 +21,14 @@ use RMT\TimeScheduling\Model\ReservationQuery;
 /**
  * @method ReservationQuery orderById($order = Criteria::ASC) Order by the id column
  * @method ReservationQuery orderByClientUserId($order = Criteria::ASC) Order by the client_user_id column
- * @method ReservationQuery orderByReserverUserId($order = Criteria::ASC) Order by the reserver_user_id column
+ * @method ReservationQuery orderByServiceProviderUserId($order = Criteria::ASC) Order by the service_provider_user_id column
  * @method ReservationQuery orderByDayId($order = Criteria::ASC) Order by the day_id column
  * @method ReservationQuery orderByStartTime($order = Criteria::ASC) Order by the start_time column
  * @method ReservationQuery orderByEndTime($order = Criteria::ASC) Order by the end_time column
  *
  * @method ReservationQuery groupById() Group by the id column
  * @method ReservationQuery groupByClientUserId() Group by the client_user_id column
- * @method ReservationQuery groupByReserverUserId() Group by the reserver_user_id column
+ * @method ReservationQuery groupByServiceProviderUserId() Group by the service_provider_user_id column
  * @method ReservationQuery groupByDayId() Group by the day_id column
  * @method ReservationQuery groupByStartTime() Group by the start_time column
  * @method ReservationQuery groupByEndTime() Group by the end_time column
@@ -41,9 +41,9 @@ use RMT\TimeScheduling\Model\ReservationQuery;
  * @method ReservationQuery rightJoinClient($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Client relation
  * @method ReservationQuery innerJoinClient($relationAlias = null) Adds a INNER JOIN clause to the query using the Client relation
  *
- * @method ReservationQuery leftJoinReserver($relationAlias = null) Adds a LEFT JOIN clause to the query using the Reserver relation
- * @method ReservationQuery rightJoinReserver($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Reserver relation
- * @method ReservationQuery innerJoinReserver($relationAlias = null) Adds a INNER JOIN clause to the query using the Reserver relation
+ * @method ReservationQuery leftJoinServiceProvider($relationAlias = null) Adds a LEFT JOIN clause to the query using the ServiceProvider relation
+ * @method ReservationQuery rightJoinServiceProvider($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ServiceProvider relation
+ * @method ReservationQuery innerJoinServiceProvider($relationAlias = null) Adds a INNER JOIN clause to the query using the ServiceProvider relation
  *
  * @method ReservationQuery leftJoinDay($relationAlias = null) Adds a LEFT JOIN clause to the query using the Day relation
  * @method ReservationQuery rightJoinDay($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Day relation
@@ -53,14 +53,14 @@ use RMT\TimeScheduling\Model\ReservationQuery;
  * @method Reservation findOneOrCreate(PropelPDO $con = null) Return the first Reservation matching the query, or a new Reservation object populated from the query conditions when no match is found
  *
  * @method Reservation findOneByClientUserId(int $client_user_id) Return the first Reservation filtered by the client_user_id column
- * @method Reservation findOneByReserverUserId(int $reserver_user_id) Return the first Reservation filtered by the reserver_user_id column
+ * @method Reservation findOneByServiceProviderUserId(int $service_provider_user_id) Return the first Reservation filtered by the service_provider_user_id column
  * @method Reservation findOneByDayId(int $day_id) Return the first Reservation filtered by the day_id column
  * @method Reservation findOneByStartTime(string $start_time) Return the first Reservation filtered by the start_time column
  * @method Reservation findOneByEndTime(string $end_time) Return the first Reservation filtered by the end_time column
  *
  * @method array findById(int $id) Return Reservation objects filtered by the id column
  * @method array findByClientUserId(int $client_user_id) Return Reservation objects filtered by the client_user_id column
- * @method array findByReserverUserId(int $reserver_user_id) Return Reservation objects filtered by the reserver_user_id column
+ * @method array findByServiceProviderUserId(int $service_provider_user_id) Return Reservation objects filtered by the service_provider_user_id column
  * @method array findByDayId(int $day_id) Return Reservation objects filtered by the day_id column
  * @method array findByStartTime(string $start_time) Return Reservation objects filtered by the start_time column
  * @method array findByEndTime(string $end_time) Return Reservation objects filtered by the end_time column
@@ -165,7 +165,7 @@ abstract class BaseReservationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `client_user_id`, `reserver_user_id`, `day_id`, `start_time`, `end_time` FROM `reservation` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `client_user_id`, `service_provider_user_id`, `day_id`, `start_time`, `end_time` FROM `reservation` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -341,19 +341,19 @@ abstract class BaseReservationQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the reserver_user_id column
+     * Filter the query on the service_provider_user_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByReserverUserId(1234); // WHERE reserver_user_id = 1234
-     * $query->filterByReserverUserId(array(12, 34)); // WHERE reserver_user_id IN (12, 34)
-     * $query->filterByReserverUserId(array('min' => 12)); // WHERE reserver_user_id >= 12
-     * $query->filterByReserverUserId(array('max' => 12)); // WHERE reserver_user_id <= 12
+     * $query->filterByServiceProviderUserId(1234); // WHERE service_provider_user_id = 1234
+     * $query->filterByServiceProviderUserId(array(12, 34)); // WHERE service_provider_user_id IN (12, 34)
+     * $query->filterByServiceProviderUserId(array('min' => 12)); // WHERE service_provider_user_id >= 12
+     * $query->filterByServiceProviderUserId(array('max' => 12)); // WHERE service_provider_user_id <= 12
      * </code>
      *
-     * @see       filterByReserver()
+     * @see       filterByServiceProvider()
      *
-     * @param     mixed $reserverUserId The value to use as filter.
+     * @param     mixed $serviceProviderUserId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -361,16 +361,16 @@ abstract class BaseReservationQuery extends ModelCriteria
      *
      * @return ReservationQuery The current query, for fluid interface
      */
-    public function filterByReserverUserId($reserverUserId = null, $comparison = null)
+    public function filterByServiceProviderUserId($serviceProviderUserId = null, $comparison = null)
     {
-        if (is_array($reserverUserId)) {
+        if (is_array($serviceProviderUserId)) {
             $useMinMax = false;
-            if (isset($reserverUserId['min'])) {
-                $this->addUsingAlias(ReservationPeer::RESERVER_USER_ID, $reserverUserId['min'], Criteria::GREATER_EQUAL);
+            if (isset($serviceProviderUserId['min'])) {
+                $this->addUsingAlias(ReservationPeer::SERVICE_PROVIDER_USER_ID, $serviceProviderUserId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($reserverUserId['max'])) {
-                $this->addUsingAlias(ReservationPeer::RESERVER_USER_ID, $reserverUserId['max'], Criteria::LESS_EQUAL);
+            if (isset($serviceProviderUserId['max'])) {
+                $this->addUsingAlias(ReservationPeer::SERVICE_PROVIDER_USER_ID, $serviceProviderUserId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -381,7 +381,7 @@ abstract class BaseReservationQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ReservationPeer::RESERVER_USER_ID, $reserverUserId, $comparison);
+        return $this->addUsingAlias(ReservationPeer::SERVICE_PROVIDER_USER_ID, $serviceProviderUserId, $comparison);
     }
 
     /**
@@ -599,35 +599,35 @@ abstract class BaseReservationQuery extends ModelCriteria
      * @return                 ReservationQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByReserver($user, $comparison = null)
+    public function filterByServiceProvider($user, $comparison = null)
     {
         if ($user instanceof User) {
             return $this
-                ->addUsingAlias(ReservationPeer::RESERVER_USER_ID, $user->getId(), $comparison);
+                ->addUsingAlias(ReservationPeer::SERVICE_PROVIDER_USER_ID, $user->getId(), $comparison);
         } elseif ($user instanceof PropelObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(ReservationPeer::RESERVER_USER_ID, $user->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(ReservationPeer::SERVICE_PROVIDER_USER_ID, $user->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByReserver() only accepts arguments of type User or PropelCollection');
+            throw new PropelException('filterByServiceProvider() only accepts arguments of type User or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Reserver relation
+     * Adds a JOIN clause to the query using the ServiceProvider relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ReservationQuery The current query, for fluid interface
      */
-    public function joinReserver($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinServiceProvider($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Reserver');
+        $relationMap = $tableMap->getRelation('ServiceProvider');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -642,14 +642,14 @@ abstract class BaseReservationQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Reserver');
+            $this->addJoinObject($join, 'ServiceProvider');
         }
 
         return $this;
     }
 
     /**
-     * Use the Reserver relation User object
+     * Use the ServiceProvider relation User object
      *
      * @see       useQuery()
      *
@@ -659,11 +659,11 @@ abstract class BaseReservationQuery extends ModelCriteria
      *
      * @return   \FOS\UserBundle\Propel\UserQuery A secondary query class using the current class as primary query
      */
-    public function useReserverQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useServiceProviderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinReserver($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Reserver', '\FOS\UserBundle\Propel\UserQuery');
+            ->joinServiceProvider($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ServiceProvider', '\FOS\UserBundle\Propel\UserQuery');
     }
 
     /**

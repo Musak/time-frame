@@ -44,7 +44,7 @@ class ReservationTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('client_user_id', 'ClientUserId', 'INTEGER', 'fos_user', 'id', true, null, null);
-        $this->addForeignKey('reserver_user_id', 'ReserverUserId', 'INTEGER', 'fos_user', 'id', true, null, null);
+        $this->addForeignKey('service_provider_user_id', 'ServiceProviderUserId', 'INTEGER', 'fos_user', 'id', true, null, null);
         $this->addForeignKey('day_id', 'DayId', 'INTEGER', 'day', 'id', false, null, null);
         $this->addColumn('start_time', 'StartTime', 'TIME', false, null, null);
         $this->addColumn('end_time', 'EndTime', 'TIME', false, null, null);
@@ -57,7 +57,7 @@ class ReservationTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Client', 'FOS\\UserBundle\\Propel\\User', RelationMap::MANY_TO_ONE, array('client_user_id' => 'id', ), null, null);
-        $this->addRelation('Reserver', 'FOS\\UserBundle\\Propel\\User', RelationMap::MANY_TO_ONE, array('reserver_user_id' => 'id', ), null, null);
+        $this->addRelation('ServiceProvider', 'FOS\\UserBundle\\Propel\\User', RelationMap::MANY_TO_ONE, array('service_provider_user_id' => 'id', ), null, null);
         $this->addRelation('Day', 'RMT\\TimeScheduling\\Model\\Day', RelationMap::MANY_TO_ONE, array('day_id' => 'id', ), null, null);
     } // buildRelations()
 

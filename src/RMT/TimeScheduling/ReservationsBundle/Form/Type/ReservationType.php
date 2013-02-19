@@ -8,9 +8,11 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class ReservationType extends AbstractType
 {
+    // @todo add distinction ad the propel user type such as in the listings of service providers
+    //       the current user does not appear in the listing
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('reserver', 'model', array(
+        $builder->add('service_provider', 'model', array(
             'class' => 'FOS\UserBundle\Propel\User',
         ));
         $builder->add('day', 'model', array(
