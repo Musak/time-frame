@@ -81,12 +81,12 @@ abstract class BaseReservation extends BaseObject implements Persistent
     /**
      * @var        User
      */
-    protected $aUserRelatedByReserveeUserId;
+    protected $aReservee;
 
     /**
      * @var        User
      */
-    protected $aUserRelatedByReserverUserId;
+    protected $aReserver;
 
     /**
      * @var        Day
@@ -261,8 +261,8 @@ abstract class BaseReservation extends BaseObject implements Persistent
             $this->modifiedColumns[] = ReservationPeer::RESERVEE_USER_ID;
         }
 
-        if ($this->aUserRelatedByReserveeUserId !== null && $this->aUserRelatedByReserveeUserId->getId() !== $v) {
-            $this->aUserRelatedByReserveeUserId = null;
+        if ($this->aReservee !== null && $this->aReservee->getId() !== $v) {
+            $this->aReservee = null;
         }
 
 
@@ -286,8 +286,8 @@ abstract class BaseReservation extends BaseObject implements Persistent
             $this->modifiedColumns[] = ReservationPeer::RESERVER_USER_ID;
         }
 
-        if ($this->aUserRelatedByReserverUserId !== null && $this->aUserRelatedByReserverUserId->getId() !== $v) {
-            $this->aUserRelatedByReserverUserId = null;
+        if ($this->aReserver !== null && $this->aReserver->getId() !== $v) {
+            $this->aReserver = null;
         }
 
 
@@ -434,11 +434,11 @@ abstract class BaseReservation extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aUserRelatedByReserveeUserId !== null && $this->reservee_user_id !== $this->aUserRelatedByReserveeUserId->getId()) {
-            $this->aUserRelatedByReserveeUserId = null;
+        if ($this->aReservee !== null && $this->reservee_user_id !== $this->aReservee->getId()) {
+            $this->aReservee = null;
         }
-        if ($this->aUserRelatedByReserverUserId !== null && $this->reserver_user_id !== $this->aUserRelatedByReserverUserId->getId()) {
-            $this->aUserRelatedByReserverUserId = null;
+        if ($this->aReserver !== null && $this->reserver_user_id !== $this->aReserver->getId()) {
+            $this->aReserver = null;
         }
         if ($this->aDay !== null && $this->day_id !== $this->aDay->getId()) {
             $this->aDay = null;
@@ -482,8 +482,8 @@ abstract class BaseReservation extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aUserRelatedByReserveeUserId = null;
-            $this->aUserRelatedByReserverUserId = null;
+            $this->aReservee = null;
+            $this->aReserver = null;
             $this->aDay = null;
         } // if (deep)
     }
@@ -603,18 +603,18 @@ abstract class BaseReservation extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aUserRelatedByReserveeUserId !== null) {
-                if ($this->aUserRelatedByReserveeUserId->isModified() || $this->aUserRelatedByReserveeUserId->isNew()) {
-                    $affectedRows += $this->aUserRelatedByReserveeUserId->save($con);
+            if ($this->aReservee !== null) {
+                if ($this->aReservee->isModified() || $this->aReservee->isNew()) {
+                    $affectedRows += $this->aReservee->save($con);
                 }
-                $this->setUserRelatedByReserveeUserId($this->aUserRelatedByReserveeUserId);
+                $this->setReservee($this->aReservee);
             }
 
-            if ($this->aUserRelatedByReserverUserId !== null) {
-                if ($this->aUserRelatedByReserverUserId->isModified() || $this->aUserRelatedByReserverUserId->isNew()) {
-                    $affectedRows += $this->aUserRelatedByReserverUserId->save($con);
+            if ($this->aReserver !== null) {
+                if ($this->aReserver->isModified() || $this->aReserver->isNew()) {
+                    $affectedRows += $this->aReserver->save($con);
                 }
-                $this->setUserRelatedByReserverUserId($this->aUserRelatedByReserverUserId);
+                $this->setReserver($this->aReserver);
             }
 
             if ($this->aDay !== null) {
@@ -807,15 +807,15 @@ abstract class BaseReservation extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aUserRelatedByReserveeUserId !== null) {
-                if (!$this->aUserRelatedByReserveeUserId->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aUserRelatedByReserveeUserId->getValidationFailures());
+            if ($this->aReservee !== null) {
+                if (!$this->aReservee->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aReservee->getValidationFailures());
                 }
             }
 
-            if ($this->aUserRelatedByReserverUserId !== null) {
-                if (!$this->aUserRelatedByReserverUserId->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aUserRelatedByReserverUserId->getValidationFailures());
+            if ($this->aReserver !== null) {
+                if (!$this->aReserver->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aReserver->getValidationFailures());
                 }
             }
 
@@ -921,11 +921,11 @@ abstract class BaseReservation extends BaseObject implements Persistent
             $keys[5] => $this->getEndTime(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aUserRelatedByReserveeUserId) {
-                $result['UserRelatedByReserveeUserId'] = $this->aUserRelatedByReserveeUserId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aReservee) {
+                $result['Reservee'] = $this->aReservee->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aUserRelatedByReserverUserId) {
-                $result['UserRelatedByReserverUserId'] = $this->aUserRelatedByReserverUserId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aReserver) {
+                $result['Reserver'] = $this->aReserver->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aDay) {
                 $result['Day'] = $this->aDay->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -1162,7 +1162,7 @@ abstract class BaseReservation extends BaseObject implements Persistent
      * @return Reservation The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setUserRelatedByReserveeUserId(User $v = null)
+    public function setReservee(User $v = null)
     {
         if ($v === null) {
             $this->setReserveeUserId(NULL);
@@ -1170,7 +1170,7 @@ abstract class BaseReservation extends BaseObject implements Persistent
             $this->setReserveeUserId($v->getId());
         }
 
-        $this->aUserRelatedByReserveeUserId = $v;
+        $this->aReservee = $v;
 
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the User object, it will not be re-added.
@@ -1191,20 +1191,20 @@ abstract class BaseReservation extends BaseObject implements Persistent
      * @return User The associated User object.
      * @throws PropelException
      */
-    public function getUserRelatedByReserveeUserId(PropelPDO $con = null, $doQuery = true)
+    public function getReservee(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aUserRelatedByReserveeUserId === null && ($this->reservee_user_id !== null) && $doQuery) {
-            $this->aUserRelatedByReserveeUserId = UserQuery::create()->findPk($this->reservee_user_id, $con);
+        if ($this->aReservee === null && ($this->reservee_user_id !== null) && $doQuery) {
+            $this->aReservee = UserQuery::create()->findPk($this->reservee_user_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aUserRelatedByReserveeUserId->addReservationsRelatedByReserveeUserId($this);
+                $this->aReservee->addReservationsRelatedByReserveeUserId($this);
              */
         }
 
-        return $this->aUserRelatedByReserveeUserId;
+        return $this->aReservee;
     }
 
     /**
@@ -1214,7 +1214,7 @@ abstract class BaseReservation extends BaseObject implements Persistent
      * @return Reservation The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setUserRelatedByReserverUserId(User $v = null)
+    public function setReserver(User $v = null)
     {
         if ($v === null) {
             $this->setReserverUserId(NULL);
@@ -1222,7 +1222,7 @@ abstract class BaseReservation extends BaseObject implements Persistent
             $this->setReserverUserId($v->getId());
         }
 
-        $this->aUserRelatedByReserverUserId = $v;
+        $this->aReserver = $v;
 
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the User object, it will not be re-added.
@@ -1243,20 +1243,20 @@ abstract class BaseReservation extends BaseObject implements Persistent
      * @return User The associated User object.
      * @throws PropelException
      */
-    public function getUserRelatedByReserverUserId(PropelPDO $con = null, $doQuery = true)
+    public function getReserver(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aUserRelatedByReserverUserId === null && ($this->reserver_user_id !== null) && $doQuery) {
-            $this->aUserRelatedByReserverUserId = UserQuery::create()->findPk($this->reserver_user_id, $con);
+        if ($this->aReserver === null && ($this->reserver_user_id !== null) && $doQuery) {
+            $this->aReserver = UserQuery::create()->findPk($this->reserver_user_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aUserRelatedByReserverUserId->addReservationsRelatedByReserverUserId($this);
+                $this->aReserver->addReservationsRelatedByReserverUserId($this);
              */
         }
 
-        return $this->aUserRelatedByReserverUserId;
+        return $this->aReserver;
     }
 
     /**
@@ -1344,11 +1344,11 @@ abstract class BaseReservation extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->aUserRelatedByReserveeUserId instanceof Persistent) {
-              $this->aUserRelatedByReserveeUserId->clearAllReferences($deep);
+            if ($this->aReservee instanceof Persistent) {
+              $this->aReservee->clearAllReferences($deep);
             }
-            if ($this->aUserRelatedByReserverUserId instanceof Persistent) {
-              $this->aUserRelatedByReserverUserId->clearAllReferences($deep);
+            if ($this->aReserver instanceof Persistent) {
+              $this->aReserver->clearAllReferences($deep);
             }
             if ($this->aDay instanceof Persistent) {
               $this->aDay->clearAllReferences($deep);
@@ -1357,8 +1357,8 @@ abstract class BaseReservation extends BaseObject implements Persistent
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        $this->aUserRelatedByReserveeUserId = null;
-        $this->aUserRelatedByReserverUserId = null;
+        $this->aReservee = null;
+        $this->aReserver = null;
         $this->aDay = null;
     }
 

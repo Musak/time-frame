@@ -56,8 +56,8 @@ class ReservationTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('UserRelatedByReserveeUserId', 'FOS\\UserBundle\\Propel\\User', RelationMap::MANY_TO_ONE, array('reservee_user_id' => 'id', ), null, null);
-        $this->addRelation('UserRelatedByReserverUserId', 'FOS\\UserBundle\\Propel\\User', RelationMap::MANY_TO_ONE, array('reserver_user_id' => 'id', ), null, null);
+        $this->addRelation('Reservee', 'FOS\\UserBundle\\Propel\\User', RelationMap::MANY_TO_ONE, array('reservee_user_id' => 'id', ), null, null);
+        $this->addRelation('Reserver', 'FOS\\UserBundle\\Propel\\User', RelationMap::MANY_TO_ONE, array('reserver_user_id' => 'id', ), null, null);
         $this->addRelation('Day', 'RMT\\TimeScheduling\\Model\\Day', RelationMap::MANY_TO_ONE, array('day_id' => 'id', ), null, null);
     } // buildRelations()
 

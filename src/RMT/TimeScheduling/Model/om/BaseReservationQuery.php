@@ -37,13 +37,13 @@ use RMT\TimeScheduling\Model\ReservationQuery;
  * @method ReservationQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method ReservationQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method ReservationQuery leftJoinUserRelatedByReserveeUserId($relationAlias = null) Adds a LEFT JOIN clause to the query using the UserRelatedByReserveeUserId relation
- * @method ReservationQuery rightJoinUserRelatedByReserveeUserId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the UserRelatedByReserveeUserId relation
- * @method ReservationQuery innerJoinUserRelatedByReserveeUserId($relationAlias = null) Adds a INNER JOIN clause to the query using the UserRelatedByReserveeUserId relation
+ * @method ReservationQuery leftJoinReservee($relationAlias = null) Adds a LEFT JOIN clause to the query using the Reservee relation
+ * @method ReservationQuery rightJoinReservee($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Reservee relation
+ * @method ReservationQuery innerJoinReservee($relationAlias = null) Adds a INNER JOIN clause to the query using the Reservee relation
  *
- * @method ReservationQuery leftJoinUserRelatedByReserverUserId($relationAlias = null) Adds a LEFT JOIN clause to the query using the UserRelatedByReserverUserId relation
- * @method ReservationQuery rightJoinUserRelatedByReserverUserId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the UserRelatedByReserverUserId relation
- * @method ReservationQuery innerJoinUserRelatedByReserverUserId($relationAlias = null) Adds a INNER JOIN clause to the query using the UserRelatedByReserverUserId relation
+ * @method ReservationQuery leftJoinReserver($relationAlias = null) Adds a LEFT JOIN clause to the query using the Reserver relation
+ * @method ReservationQuery rightJoinReserver($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Reserver relation
+ * @method ReservationQuery innerJoinReserver($relationAlias = null) Adds a INNER JOIN clause to the query using the Reserver relation
  *
  * @method ReservationQuery leftJoinDay($relationAlias = null) Adds a LEFT JOIN clause to the query using the Day relation
  * @method ReservationQuery rightJoinDay($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Day relation
@@ -307,7 +307,7 @@ abstract class BaseReservationQuery extends ModelCriteria
      * $query->filterByReserveeUserId(array('max' => 12)); // WHERE reservee_user_id <= 12
      * </code>
      *
-     * @see       filterByUserRelatedByReserveeUserId()
+     * @see       filterByReservee()
      *
      * @param     mixed $reserveeUserId The value to use as filter.
      *              Use scalar values for equality.
@@ -351,7 +351,7 @@ abstract class BaseReservationQuery extends ModelCriteria
      * $query->filterByReserverUserId(array('max' => 12)); // WHERE reserver_user_id <= 12
      * </code>
      *
-     * @see       filterByUserRelatedByReserverUserId()
+     * @see       filterByReserver()
      *
      * @param     mixed $reserverUserId The value to use as filter.
      *              Use scalar values for equality.
@@ -523,7 +523,7 @@ abstract class BaseReservationQuery extends ModelCriteria
      * @return                 ReservationQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByUserRelatedByReserveeUserId($user, $comparison = null)
+    public function filterByReservee($user, $comparison = null)
     {
         if ($user instanceof User) {
             return $this
@@ -536,22 +536,22 @@ abstract class BaseReservationQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ReservationPeer::RESERVEE_USER_ID, $user->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByUserRelatedByReserveeUserId() only accepts arguments of type User or PropelCollection');
+            throw new PropelException('filterByReservee() only accepts arguments of type User or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the UserRelatedByReserveeUserId relation
+     * Adds a JOIN clause to the query using the Reservee relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ReservationQuery The current query, for fluid interface
      */
-    public function joinUserRelatedByReserveeUserId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinReservee($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('UserRelatedByReserveeUserId');
+        $relationMap = $tableMap->getRelation('Reservee');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -566,14 +566,14 @@ abstract class BaseReservationQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'UserRelatedByReserveeUserId');
+            $this->addJoinObject($join, 'Reservee');
         }
 
         return $this;
     }
 
     /**
-     * Use the UserRelatedByReserveeUserId relation User object
+     * Use the Reservee relation User object
      *
      * @see       useQuery()
      *
@@ -583,11 +583,11 @@ abstract class BaseReservationQuery extends ModelCriteria
      *
      * @return   \FOS\UserBundle\Propel\UserQuery A secondary query class using the current class as primary query
      */
-    public function useUserRelatedByReserveeUserIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useReserveeQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinUserRelatedByReserveeUserId($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'UserRelatedByReserveeUserId', '\FOS\UserBundle\Propel\UserQuery');
+            ->joinReservee($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Reservee', '\FOS\UserBundle\Propel\UserQuery');
     }
 
     /**
@@ -599,7 +599,7 @@ abstract class BaseReservationQuery extends ModelCriteria
      * @return                 ReservationQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByUserRelatedByReserverUserId($user, $comparison = null)
+    public function filterByReserver($user, $comparison = null)
     {
         if ($user instanceof User) {
             return $this
@@ -612,22 +612,22 @@ abstract class BaseReservationQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ReservationPeer::RESERVER_USER_ID, $user->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByUserRelatedByReserverUserId() only accepts arguments of type User or PropelCollection');
+            throw new PropelException('filterByReserver() only accepts arguments of type User or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the UserRelatedByReserverUserId relation
+     * Adds a JOIN clause to the query using the Reserver relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ReservationQuery The current query, for fluid interface
      */
-    public function joinUserRelatedByReserverUserId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinReserver($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('UserRelatedByReserverUserId');
+        $relationMap = $tableMap->getRelation('Reserver');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -642,14 +642,14 @@ abstract class BaseReservationQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'UserRelatedByReserverUserId');
+            $this->addJoinObject($join, 'Reserver');
         }
 
         return $this;
     }
 
     /**
-     * Use the UserRelatedByReserverUserId relation User object
+     * Use the Reserver relation User object
      *
      * @see       useQuery()
      *
@@ -659,11 +659,11 @@ abstract class BaseReservationQuery extends ModelCriteria
      *
      * @return   \FOS\UserBundle\Propel\UserQuery A secondary query class using the current class as primary query
      */
-    public function useUserRelatedByReserverUserIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useReserverQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinUserRelatedByReserverUserId($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'UserRelatedByReserverUserId', '\FOS\UserBundle\Propel\UserQuery');
+            ->joinReserver($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Reserver', '\FOS\UserBundle\Propel\UserQuery');
     }
 
     /**

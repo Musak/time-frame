@@ -487,7 +487,7 @@ abstract class BaseReservationPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related UserRelatedByReserveeUserId table
+     * Returns the number of rows matching criteria, joining the related Reservee table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -495,7 +495,7 @@ abstract class BaseReservationPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinUserRelatedByReserveeUserId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinReservee(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -538,7 +538,7 @@ abstract class BaseReservationPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related UserRelatedByReserverUserId table
+     * Returns the number of rows matching criteria, joining the related Reserver table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -546,7 +546,7 @@ abstract class BaseReservationPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinUserRelatedByReserverUserId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinReserver(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -648,7 +648,7 @@ abstract class BaseReservationPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinUserRelatedByReserveeUserId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinReservee(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -715,7 +715,7 @@ abstract class BaseReservationPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinUserRelatedByReserverUserId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinReserver(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -1011,7 +1011,7 @@ abstract class BaseReservationPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related UserRelatedByReserveeUserId table
+     * Returns the number of rows matching criteria, joining the related Reservee table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -1019,7 +1019,7 @@ abstract class BaseReservationPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAllExceptUserRelatedByReserveeUserId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinAllExceptReservee(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -1062,7 +1062,7 @@ abstract class BaseReservationPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related UserRelatedByReserverUserId table
+     * Returns the number of rows matching criteria, joining the related Reserver table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -1070,7 +1070,7 @@ abstract class BaseReservationPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAllExceptUserRelatedByReserverUserId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinAllExceptReserver(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -1166,7 +1166,7 @@ abstract class BaseReservationPeer
 
 
     /**
-     * Selects a collection of Reservation objects pre-filled with all related objects except UserRelatedByReserveeUserId.
+     * Selects a collection of Reservation objects pre-filled with all related objects except Reservee.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -1175,7 +1175,7 @@ abstract class BaseReservationPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptUserRelatedByReserveeUserId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptReservee(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -1240,7 +1240,7 @@ abstract class BaseReservationPeer
 
 
     /**
-     * Selects a collection of Reservation objects pre-filled with all related objects except UserRelatedByReserverUserId.
+     * Selects a collection of Reservation objects pre-filled with all related objects except Reserver.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -1249,7 +1249,7 @@ abstract class BaseReservationPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptUserRelatedByReserverUserId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptReserver(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 

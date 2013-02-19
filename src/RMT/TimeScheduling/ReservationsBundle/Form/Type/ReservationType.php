@@ -10,10 +10,10 @@ class ReservationType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('reserver_user_id', 'model', array(
+        $builder->add('reserver', 'model', array(
             'class' => 'FOS\UserBundle\Propel\User',
         ));
-        $builder->add('reservee_user_id', 'model', array(
+        $builder->add('reservee', 'model', array(
             'class' => 'FOS\UserBundle\Propel\User',
         ));
         $builder->add('day', 'model', array(

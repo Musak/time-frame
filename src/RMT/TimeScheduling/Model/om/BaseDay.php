@@ -1139,10 +1139,10 @@ abstract class BaseDay extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Reservation[] List of Reservation objects
      */
-    public function getReservationsJoinUserRelatedByReserveeUserId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getReservationsJoinReservee($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = ReservationQuery::create(null, $criteria);
-        $query->joinWith('UserRelatedByReserveeUserId', $join_behavior);
+        $query->joinWith('Reservee', $join_behavior);
 
         return $this->getReservations($query, $con);
     }
@@ -1164,10 +1164,10 @@ abstract class BaseDay extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Reservation[] List of Reservation objects
      */
-    public function getReservationsJoinUserRelatedByReserverUserId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getReservationsJoinReserver($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = ReservationQuery::create(null, $criteria);
-        $query->joinWith('UserRelatedByReserverUserId', $join_behavior);
+        $query->joinWith('Reserver', $join_behavior);
 
         return $this->getReservations($query, $con);
     }
