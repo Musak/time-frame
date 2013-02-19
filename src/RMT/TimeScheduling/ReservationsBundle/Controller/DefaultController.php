@@ -10,14 +10,17 @@ class DefaultController extends Controller
 {
     public function indexAction()
     {
-    	$request = $this->getRequest();
+        $user        = $this->getUser();
+    	$request     = $this->getRequest();
     	$reservation = new Reservation();
+
     	$form = $this->createForm(new ReservationType(), $reservation);
     	
     	if($request->getMethod() == 'POST')
     	{
     		$form->bindRequest($request);
             if ($form->isValid()) {
+                $reservation->setReservee($user);
             	$reservation->save();
             }
     	}

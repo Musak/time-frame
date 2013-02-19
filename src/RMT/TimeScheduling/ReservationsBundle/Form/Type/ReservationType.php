@@ -13,9 +13,6 @@ class ReservationType extends AbstractType
         $builder->add('reserver', 'model', array(
             'class' => 'FOS\UserBundle\Propel\User',
         ));
-        $builder->add('reservee', 'model', array(
-            'class' => 'FOS\UserBundle\Propel\User',
-        ));
         $builder->add('day', 'model', array(
             'class' => 'RMT\TimeScheduling\Model\Day',
         ));
