@@ -16,8 +16,8 @@
     	<foreign-key foreignTable="day">
     		<reference local="day_id" foreign="id" />
     	</foreign-key>
-    	<column name="start_time" type="time" />
-    	<column name="end_time" type="time" />
+    	<column name="start_time" type="time" required="true" />
+    	<column name="end_time" type="time" required="true" />
     </table>
 
 </database>

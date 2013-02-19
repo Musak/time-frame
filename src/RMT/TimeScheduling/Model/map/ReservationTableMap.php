@@ -46,8 +46,8 @@ class ReservationTableMap extends TableMap
         $this->addForeignKey('client_user_id', 'ClientUserId', 'INTEGER', 'fos_user', 'id', true, null, null);
         $this->addForeignKey('service_provider_user_id', 'ServiceProviderUserId', 'INTEGER', 'fos_user', 'id', true, null, null);
         $this->addForeignKey('day_id', 'DayId', 'INTEGER', 'day', 'id', false, null, null);
-        $this->addColumn('start_time', 'StartTime', 'TIME', false, null, null);
-        $this->addColumn('end_time', 'EndTime', 'TIME', false, null, null);
+        $this->addColumn('start_time', 'StartTime', 'TIME', true, null, null);
+        $this->addColumn('end_time', 'EndTime', 'TIME', true, null, null);
         // validators
     } // initialize()
 
