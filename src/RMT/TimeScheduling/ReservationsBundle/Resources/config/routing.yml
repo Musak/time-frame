@@ -1,3 +1,9 @@
 rmt_time_scheduling_reservations:
     pattern:  /reservations
     defaults: { _controller: RMTTimeSchedulingReservationsBundle:Default:index }
+
+# @todo instead of in url parameters have those validated and submitted from the weekly
+# grid directly because the time will not be in fixed spans of 1 hour
+rmt_time_scheduling_reservation_add:
+    pattern: /reservation/add/{service_provider_id}/{reservation_hour}
+    defaults: { _controller: RMTTimeSchedulingReservationsBundle:Default:reserve }

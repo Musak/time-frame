@@ -7,14 +7,15 @@ use RMT\TimeScheduling\Model\DayIntervalQuery;
 
 class DefaultController extends Controller
 {
-    public function indexAction()
+    public function indexAction($user_id)
     {
-
     	$user = $this->getUser();
         $day_intervals = DayIntervalQuery::create()
-            ->filterByUser($user)
+            ->filterByUserId($user_id)
             ->find();
         
+        $my_grid = $user->getId() == $user_id;
+
         $days = array();
         foreach($day_intervals as $day_interval){
 
@@ -23,7 +24,11 @@ class DefaultController extends Controller
     				'end_hour' => $day_interval->getEndHour()->format('H')
     			);
         }
-        //var_dump($days);exit;
-        return $this->render('RMTTimeSchedulingWeeklyGridBundle:Default:index.html.twig',array('days'=>$days));
+
+        return $this->render('RMTTimeSchedulingWeeklyGridBundle:Default:index.html.twig',array(
+          'days'                => $days,
+          'my_grid'             => $my_grid,
+          'service_provider_id' => $user_id
+        ));
     }
 }
