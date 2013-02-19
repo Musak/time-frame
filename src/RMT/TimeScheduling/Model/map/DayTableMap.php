@@ -42,8 +42,8 @@ class DayTableMap extends TableMap
         $this->setPackage('src.RMT.TimeScheduling.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('VALUE', 'Value', 'VARCHAR', false, 255, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('value', 'Value', 'VARCHAR', false, 255, null);
         // validators
     } // initialize()
 
