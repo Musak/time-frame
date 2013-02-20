@@ -4,7 +4,8 @@ namespace RMT\TimeScheduling\ReservationsBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use RMT\TimeScheduling\Model\Reservation;
+use RMT\TimeScheduling\Model\Reservation; 
+use RMT\TimeScheduling\Model\DayQuery;
 use RMT\TimeScheduling\ReservationsBundle\Form\Type\ReservationType;
 
 class DefaultController extends Controller
@@ -30,15 +31,27 @@ class DefaultController extends Controller
 
 
     // @todo missing day in save
-    public function reserveAction($service_provider_id, $reservation_hour) {
+    public function reserveAction($service_provider_id, $reservation_hour, $day_name) {
         $user = $this->getUser();
         $reservation = new Reservation();
-        $reservation->setClient($user);
-        // @todo add service provider user validation
-        $reservation->setServiceProviderUserId($service_provider_id);
-        $reservation->setStartTime(strtotime("$reservation_hour:00"));
-        $reservation->setEndTime(strtotime("$reservation_hour:00 + 1 Hour"));
-        $reservation->save();
+        $form = $this->createForm(new ReservationType(), $reservation, array('csrf_protection' => false));
+        $form->bind(array(
+          'service_provider' => $service_provider_id,
+          'start_time' => strtotime("$reservation_hour:00"),
+          'end_time'   => strtotime("$reservation_hour:00 + 1 Hour"),
+          'day'        => DayQuery::create()->filterByValue($day_name)->findOne()->getId()
+            ));
+        if ($form->isValid())
+        {
+            $reservation->setClient($user);
+            $reservation->save();
+        }
+        else
+        {
+            print_r(get_class_methods($form));
+            var_dump($form->getErrorsAsString());
+            exit;
+        }
 
         $referer = $this->getRequest()->headers->get('referer');  
         return new RedirectResponse($referer);

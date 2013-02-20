@@ -43,7 +43,7 @@
 		 			<td>
 		 				{%if days[j] is defined and i >= days[j].start_hour and i <= days[j].end_hour %}
                {% if not my_grid %}
-                <a href="{{ path('rmt_time_scheduling_reservation_add', {'service_provider_id': service_provider_id, 'reservation_hour': days[j].start_hour}) }}"
+                <a href="{{ path('rmt_time_scheduling_reservation_add', {'service_provider_id': service_provider_id, 'reservation_hour': days[j].start_hour, 'day_name': j}) }}"
                    class="btn btn-success">
                    Reserve
                 </a>
