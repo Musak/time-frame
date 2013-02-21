@@ -1,4 +1,4 @@
-{% extends 'RMTUserManagmentDashboardBundle::layout.html.twig' %}
+{% extends ':Dashboard:layout.html.twig' %}
 {% block dashboard_content %}
 <h1>{{'Welcome %username%'|trans({'%username%':app.user.username})}}</h1> 
 {% if not has_interval %}
