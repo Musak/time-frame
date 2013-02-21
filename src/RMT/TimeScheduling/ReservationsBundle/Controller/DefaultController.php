@@ -37,8 +37,8 @@ class DefaultController extends Controller
         $form = $this->createForm(new ReservationType(), $reservation, array('csrf_protection' => false));
         $form->bind(array(
           'service_provider' => $service_provider_id,
-          'start_time' => strtotime("$reservation_hour:00"),
-          'end_time'   => strtotime("$reservation_hour:00 + 1 Hour"),
+          'start_time' => array('hour' => (int)$reservation_hour, 'minute' => '0'),
+          'end_time'   => array('hour'=> 1+ (int)$reservation_hour,'minute'=>'0'),//, strtotime("$reservation_hour:00:00 + 1 Hour")),
           'day'        => DayQuery::create()->filterByValue($day_name)->findOne()->getId()
             ));
         if ($form->isValid())
@@ -46,13 +46,6 @@ class DefaultController extends Controller
             $reservation->setClient($user);
             $reservation->save();
         }
-        else
-        {
-            print_r(get_class_methods($form));
-            var_dump($form->getErrorsAsString());
-            exit;
-        }
-
         $referer = $this->getRequest()->headers->get('referer');  
         return new RedirectResponse($referer);
     }

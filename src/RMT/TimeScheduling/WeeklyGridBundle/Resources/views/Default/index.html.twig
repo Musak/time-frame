@@ -4,60 +4,60 @@
 
 <table class='table'>
 
-	<thead>
-		<th>
-			Hours
-		</th>
-		<th>
-			Monday
-		</th>
-		<th>
-			Tuesday
-		</th>
-		<th>
-			Wednesday
+    <thead>
+        <th>
+            Hours
+        </th>
+        <th>
+            Monday
+        </th>
+        <th>
+            Tuesday
+        </th>
+        <th>
+            Wednesday
 
-		</th>
-		<th>
-			Thursday
-		</th>
-		<th>
-			Friday
-		</th>
-		<th>
-			Saturday
-		</th>
-		<th>
-			Sunday
-		</th>
-	</thead>
-	<tbody>
+        </th>
+        <th>
+            Thursday
+        </th>
+        <th>
+            Friday
+        </th>
+        <th>
+            Saturday
+        </th>
+        <th>
+            Sunday
+        </th>
+    </thead>
+    <tbody>
 
-		 {% for i in range (0,24) %}
-		 	
-		 	<tr>
-		 		<td>
-		 			{{i}}:00
-		 		</td>
-		 		{% for j in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] %}
-		 			<td>
-		 				{%if days[j] is defined and i >= days[j].start_hour and i <= days[j].end_hour %}
-               {% if not my_grid %}
-                <a href="{{ path('rmt_time_scheduling_reservation_add', {'service_provider_id': service_provider_id, 'reservation_hour': days[j].start_hour, 'day_name': j}) }}"
-                   class="btn btn-success">
-                   Reserve
-                </a>
-                {% else %}
-                <span style="background-color: #99ff99; display: block;">&nbsp;</span>
-                {% endif %}
-		 		 		{% endif %}
-		 		 	</td>
-		 		{% endfor %}
-		 	</tr>
+         {% for i in range (0,24) %}
+            
+            <tr>
+                <td>
+                    {{i}}:00
+                </td>
+                {% for j in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] %}
+                    <td>
+                        {%if days[j] is defined and i >= days[j].start_hour and i <= days[j].end_hour %}
+                           {% if not my_grid %}
+                                <a href="{{ path('rmt_time_scheduling_reservation_add', {'service_provider_id': service_provider_id, 'reservation_hour': i, 'day_name': j}) }}"
+                                   class="btn btn-success">
+                                   Reserve
+                                </a>
+                            {% else %}
+                                <span style="background-color: #99ff99; display: block;">&nbsp;</span>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
 
-		 {% endfor %}
+         {% endfor %}
 
-	</tbody>
+    </tbody>
 
 </table>
 

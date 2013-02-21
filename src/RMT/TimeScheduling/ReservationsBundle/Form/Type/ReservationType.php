@@ -18,8 +18,8 @@ class ReservationType extends AbstractType
         $builder->add('day', 'model', array(
             'class' => 'RMT\TimeScheduling\Model\Day',
         ));
-        $builder->add('start_time');
-        $builder->add('end_time');
+        $builder->add('start_time', 'time');
+        $builder->add('end_time', 'time');
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
