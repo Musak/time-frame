@@ -1,0 +1,26 @@
+{% extends 'MopaBootstrapBundle::layout.html.twig' %}
+{% block head_style %}
+    {{ parent() }}
+    {# Override this block to add your own files! #}
+    {% stylesheets
+        '../app/Resources/public/css/dashboard.css'
+    %}
+    <link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen" />
+    {% endstylesheets %}
+    {# To use this without less use the base_css.html.twig template as your base
+     # Be sure you understand whats going on: have a look into
+     # https://github.com/phiamo/MopaBootstrapBundle/blob/master/Resources/doc/css-vs-less.md
+     #}
+{% endblock head_style %}
+{% block content %}
+<div class="row-fluid"> 
+    <div class="span2">
+        <div class="sidebar"> {{ knp_menu_render('user_menu') }}</div>
+    </div>
+    <div class="span10" id="dashboardContent">
+         {% block dashboard_content %}
+              gut
+         {% endblock dashboard_content %}
+    </div>    
+</div>
+{% endblock content %}

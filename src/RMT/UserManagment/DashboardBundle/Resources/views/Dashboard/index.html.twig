@@ -1,0 +1,12 @@
+{% extends ':Dashboard:layout.html.twig' %}
+{% block dashboard_content %}
+<h1>{{'Welcome %username%'|trans({'%username%':app.user.username})}}</h1> 
+{% if not has_interval %}
+
+    <div class="alert fade in ">
+        <a href="#" data-dismiss="alert" class="close">×</a>
+        <strong>{{'Warning'|trans()}}!</strong> {{'There is no scheduled time set. Please click %here%'|trans({'%here%':'<a href="'~path('rmt_time_scheduling_working_hours')~'">'~'here'|trans()~'</a>'})|raw}}.
+    </div>
+
+{% endif %}
+{% endblock dashboard_content %}

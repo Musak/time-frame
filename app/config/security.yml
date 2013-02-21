@@ -20,6 +20,7 @@ security:
             form_login:
                 provider: fos_userbundle
                 csrf_provider: form.csrf_provider
+                default_target_path: /dashboard
             logout:       true
             anonymous:    true
 
@@ -28,4 +29,4 @@ security:
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_ADMIN }
-
+        - { path: ^/dashboard, role: ROLE_USER }

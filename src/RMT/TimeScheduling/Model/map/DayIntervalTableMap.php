@@ -42,11 +42,11 @@ class DayIntervalTableMap extends TableMap
         $this->setPackage('src.RMT.TimeScheduling.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('USER_ID', 'UserId', 'INTEGER', 'fos_user', 'ID', true, null, null);
-        $this->addForeignKey('DAY_ID', 'DayId', 'INTEGER', 'day', 'ID', false, null, null);
-        $this->addColumn('START_HOUR', 'StartHour', 'TIME', false, null, null);
-        $this->addColumn('END_HOUR', 'EndHour', 'TIME', false, null, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('user_id', 'UserId', 'INTEGER', 'fos_user', 'id', true, null, null);
+        $this->addForeignKey('day_id', 'DayId', 'INTEGER', 'day', 'id', false, null, null);
+        $this->addColumn('start_hour', 'StartHour', 'TIME', false, null, null);
+        $this->addColumn('end_hour', 'EndHour', 'TIME', false, null, null);
         // validators
     } // initialize()
 

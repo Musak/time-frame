@@ -39,20 +39,20 @@ abstract class BaseDayIntervalPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 5;
 
-    /** the column name for the ID field */
-    const ID = 'day_interval.ID';
+    /** the column name for the id field */
+    const ID = 'day_interval.id';
 
-    /** the column name for the USER_ID field */
-    const USER_ID = 'day_interval.USER_ID';
+    /** the column name for the user_id field */
+    const USER_ID = 'day_interval.user_id';
 
-    /** the column name for the DAY_ID field */
-    const DAY_ID = 'day_interval.DAY_ID';
+    /** the column name for the day_id field */
+    const DAY_ID = 'day_interval.day_id';
 
-    /** the column name for the START_HOUR field */
-    const START_HOUR = 'day_interval.START_HOUR';
+    /** the column name for the start_hour field */
+    const START_HOUR = 'day_interval.start_hour';
 
-    /** the column name for the END_HOUR field */
-    const END_HOUR = 'day_interval.END_HOUR';
+    /** the column name for the end_hour field */
+    const END_HOUR = 'day_interval.end_hour';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -173,11 +173,11 @@ abstract class BaseDayIntervalPeer
             $criteria->addSelectColumn(DayIntervalPeer::START_HOUR);
             $criteria->addSelectColumn(DayIntervalPeer::END_HOUR);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.USER_ID');
-            $criteria->addSelectColumn($alias . '.DAY_ID');
-            $criteria->addSelectColumn($alias . '.START_HOUR');
-            $criteria->addSelectColumn($alias . '.END_HOUR');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.user_id');
+            $criteria->addSelectColumn($alias . '.day_id');
+            $criteria->addSelectColumn($alias . '.start_hour');
+            $criteria->addSelectColumn($alias . '.end_hour');
         }
     }
 
@@ -261,7 +261,7 @@ abstract class BaseDayIntervalPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -366,8 +366,15 @@ abstract class BaseDayIntervalPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (DayIntervalPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         DayIntervalPeer::$instances = array();
     }
 
@@ -1133,7 +1140,7 @@ abstract class BaseDayIntervalPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return DayIntervalPeer::OM_CLASS;
     }

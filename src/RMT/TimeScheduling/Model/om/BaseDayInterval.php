@@ -97,6 +97,12 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -151,11 +157,14 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -183,11 +192,14 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -198,7 +210,7 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -219,7 +231,7 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
      */
     public function setUserId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -244,7 +256,7 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
      */
     public function setDayId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -351,7 +363,7 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 5; // 5 = DayIntervalPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -592,19 +604,19 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(DayIntervalPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(DayIntervalPeer::USER_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`USER_ID`';
+            $modifiedColumns[':p' . $index++]  = '`user_id`';
         }
         if ($this->isColumnModified(DayIntervalPeer::DAY_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`DAY_ID`';
+            $modifiedColumns[':p' . $index++]  = '`day_id`';
         }
         if ($this->isColumnModified(DayIntervalPeer::START_HOUR)) {
-            $modifiedColumns[':p' . $index++]  = '`START_HOUR`';
+            $modifiedColumns[':p' . $index++]  = '`start_hour`';
         }
         if ($this->isColumnModified(DayIntervalPeer::END_HOUR)) {
-            $modifiedColumns[':p' . $index++]  = '`END_HOUR`';
+            $modifiedColumns[':p' . $index++]  = '`end_hour`';
         }
 
         $sql = sprintf(
@@ -617,19 +629,19 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`USER_ID`':
+                    case '`user_id`':
                         $stmt->bindValue($identifier, $this->user_id, PDO::PARAM_INT);
                         break;
-                    case '`DAY_ID`':
+                    case '`day_id`':
                         $stmt->bindValue($identifier, $this->day_id, PDO::PARAM_INT);
                         break;
-                    case '`START_HOUR`':
+                    case '`start_hour`':
                         $stmt->bindValue($identifier, $this->start_hour, PDO::PARAM_STR);
                         break;
-                    case '`END_HOUR`':
+                    case '`end_hour`':
                         $stmt->bindValue($identifier, $this->end_hour, PDO::PARAM_STR);
                         break;
                 }
@@ -700,11 +712,11 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1092,12 +1104,13 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
      * Get the associated User object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return User The associated User object.
      * @throws PropelException
      */
-    public function getUser(PropelPDO $con = null)
+    public function getUser(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aUser === null && ($this->user_id !== null)) {
+        if ($this->aUser === null && ($this->user_id !== null) && $doQuery) {
             $this->aUser = UserQuery::create()->findPk($this->user_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1143,12 +1156,13 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
      * Get the associated Day object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Day The associated Day object.
      * @throws PropelException
      */
-    public function getDay(PropelPDO $con = null)
+    public function getDay(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aDay === null && ($this->day_id !== null)) {
+        if ($this->aDay === null && ($this->day_id !== null) && $doQuery) {
             $this->aDay = DayQuery::create()->findPk($this->day_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1174,6 +1188,7 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
         $this->end_hour = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1191,7 +1206,16 @@ abstract class BaseDayInterval extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aUser instanceof Persistent) {
+              $this->aUser->clearAllReferences($deep);
+            }
+            if ($this->aDay instanceof Persistent) {
+              $this->aDay->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aUser = null;

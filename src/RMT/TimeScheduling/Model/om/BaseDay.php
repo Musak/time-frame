@@ -73,6 +73,12 @@ abstract class BaseDay extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -106,7 +112,7 @@ abstract class BaseDay extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -127,7 +133,7 @@ abstract class BaseDay extends BaseObject implements Persistent
      */
     public function setValue($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -181,7 +187,7 @@ abstract class BaseDay extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 2; // 2 = DayPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -382,7 +388,7 @@ abstract class BaseDay extends BaseObject implements Persistent
 
             if ($this->collDayIntervals !== null) {
                 foreach ($this->collDayIntervals as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -415,10 +421,10 @@ abstract class BaseDay extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(DayPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(DayPeer::VALUE)) {
-            $modifiedColumns[':p' . $index++]  = '`VALUE`';
+            $modifiedColumns[':p' . $index++]  = '`value`';
         }
 
         $sql = sprintf(
@@ -431,10 +437,10 @@ abstract class BaseDay extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`VALUE`':
+                    case '`value`':
                         $stmt->bindValue($identifier, $this->value, PDO::PARAM_STR);
                         break;
                 }
@@ -505,11 +511,11 @@ abstract class BaseDay extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -850,13 +856,15 @@ abstract class BaseDay extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Day The current object (for fluent API support)
      * @see        addDayIntervals()
      */
     public function clearDayIntervals()
     {
         $this->collDayIntervals = null; // important to set this to null since that means it is uninitialized
         $this->collDayIntervalsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -928,6 +936,7 @@ abstract class BaseDay extends BaseObject implements Persistent
                       $this->collDayIntervalsPartial = true;
                     }
 
+                    $collDayIntervals->getInternalIterator()->rewind();
                     return $collDayIntervals;
                 }
 
@@ -955,12 +964,15 @@ abstract class BaseDay extends BaseObject implements Persistent
      *
      * @param PropelCollection $dayIntervals A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Day The current object (for fluent API support)
      */
     public function setDayIntervals(PropelCollection $dayIntervals, PropelPDO $con = null)
     {
-        $this->dayIntervalsScheduledForDeletion = $this->getDayIntervals(new Criteria(), $con)->diff($dayIntervals);
+        $dayIntervalsToDelete = $this->getDayIntervals(new Criteria(), $con)->diff($dayIntervals);
 
-        foreach ($this->dayIntervalsScheduledForDeletion as $dayIntervalRemoved) {
+        $this->dayIntervalsScheduledForDeletion = unserialize(serialize($dayIntervalsToDelete));
+
+        foreach ($dayIntervalsToDelete as $dayIntervalRemoved) {
             $dayIntervalRemoved->setDay(null);
         }
 
@@ -971,6 +983,8 @@ abstract class BaseDay extends BaseObject implements Persistent
 
         $this->collDayIntervals = $dayIntervals;
         $this->collDayIntervalsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -988,22 +1002,22 @@ abstract class BaseDay extends BaseObject implements Persistent
         if (null === $this->collDayIntervals || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collDayIntervals) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getDayIntervals());
-                }
-                $query = DayIntervalQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByDay($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collDayIntervals);
+
+            if($partial && !$criteria) {
+                return count($this->getDayIntervals());
+            }
+            $query = DayIntervalQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByDay($this)
+                ->count($con);
         }
+
+        return count($this->collDayIntervals);
     }
 
     /**
@@ -1019,7 +1033,7 @@ abstract class BaseDay extends BaseObject implements Persistent
             $this->initDayIntervals();
             $this->collDayIntervalsPartial = true;
         }
-        if (!$this->collDayIntervals->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collDayIntervals->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddDayInterval($l);
         }
 
@@ -1037,6 +1051,7 @@ abstract class BaseDay extends BaseObject implements Persistent
 
     /**
      * @param	DayInterval $dayInterval The dayInterval object to remove.
+     * @return Day The current object (for fluent API support)
      */
     public function removeDayInterval($dayInterval)
     {
@@ -1049,6 +1064,8 @@ abstract class BaseDay extends BaseObject implements Persistent
             $this->dayIntervalsScheduledForDeletion[]= $dayInterval;
             $dayInterval->setDay(null);
         }
+
+        return $this;
     }
 
 
@@ -1085,6 +1102,7 @@ abstract class BaseDay extends BaseObject implements Persistent
         $this->value = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1102,12 +1120,15 @@ abstract class BaseDay extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collDayIntervals) {
                 foreach ($this->collDayIntervals as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collDayIntervals instanceof PropelCollection) {

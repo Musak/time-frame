@@ -1,0 +1,8 @@
+parameters:
+#    rmt_user_managment_dashboard.example.class: RMT\UserManagment\DashboardBundle\Example
+
+services:
+    dashboard.configure_menu_listener:
+        class: RMT\UserManagment\DashboardBundle\Menu\ConfigureMenuListener
+        tags:
+          - { name: kernel.event_listener, event: menu.user_menu_configure, method: onMenuConfigure }

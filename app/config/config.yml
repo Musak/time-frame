@@ -27,7 +27,7 @@ twig:
 assetic:
     debug:          "%kernel.debug%"
     use_controller: false
-    bundles:        [MopaBootstrapBundle, FOSUserBundle]
+    bundles:        [MopaBootstrapBundle, FOSUserBundle, RMTUserManagmentDashboardBundle]
     #java: /usr/bin/java
     filters:
         less:
