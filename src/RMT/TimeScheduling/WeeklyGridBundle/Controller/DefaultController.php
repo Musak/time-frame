@@ -28,11 +28,18 @@ class DefaultController extends Controller
     				'end_hour' => $day_interval->getEndHour()->format('H')
     			);
         }
-        $reserved = ReservationQuery::create()
-            ->filterByServiceProvider($service_provider_user)
-            ->find()
-            ->toKeyValue('StartTime','EndTime');
 
+
+        $reservations = ReservationQuery::create()
+            ->filterByServiceProvider($service_provider_user)
+            ->find();
+        $reserved = array();    
+
+        foreach ($reservations as $reservation) {
+
+            $reserved[$reservation->getStartTime()->format('G')][] = $reservation->getDay()->getValue();
+
+        }
         return $this->render('RMTTimeSchedulingWeeklyGridBundle:Default:index.html.twig',array(
           'days'                => $days,
           'my_grid'             => $my_grid,
