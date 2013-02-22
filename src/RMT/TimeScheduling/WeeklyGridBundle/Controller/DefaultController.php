@@ -29,12 +29,19 @@ class DefaultController extends Controller
     			);
         }
 
+        $my_reservations = ReservationQuery::create()
+            ->filterByServiceProvider($service_provider_user)
+            ->filterByClient($user)
+            ->find();
+        $my_reserved=array();
+        foreach ($my_reservations as $my_reservation) {
+            $my_reserved[$my_reservation->getStartTime()->format('G')][] = $my_reservation->getDay()->getValue();
+        }
 
+        $reserved = array();    
         $reservations = ReservationQuery::create()
             ->filterByServiceProvider($service_provider_user)
             ->find();
-        $reserved = array();    
-
         foreach ($reservations as $reservation) {
 
             $reserved[$reservation->getStartTime()->format('G')][] = $reservation->getDay()->getValue();
@@ -44,7 +51,8 @@ class DefaultController extends Controller
           'days'                => $days,
           'my_grid'             => $my_grid,
           'reserved'            => $reserved,
-          'service_provider_id' => $user_id
+          'service_provider_id' => $user_id,
+          'my_reserved'         => $my_reserved
 
         ));
     }
