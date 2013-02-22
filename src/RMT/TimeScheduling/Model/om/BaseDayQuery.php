@@ -16,6 +16,7 @@ use RMT\TimeScheduling\Model\Day;
 use RMT\TimeScheduling\Model\DayInterval;
 use RMT\TimeScheduling\Model\DayPeer;
 use RMT\TimeScheduling\Model\DayQuery;
+use RMT\TimeScheduling\Model\Reservation;
 
 /**
  * @method DayQuery orderById($order = Criteria::ASC) Order by the id column
@@ -27,6 +28,10 @@ use RMT\TimeScheduling\Model\DayQuery;
  * @method DayQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method DayQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method DayQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ *
+ * @method DayQuery leftJoinReservation($relationAlias = null) Adds a LEFT JOIN clause to the query using the Reservation relation
+ * @method DayQuery rightJoinReservation($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Reservation relation
+ * @method DayQuery innerJoinReservation($relationAlias = null) Adds a INNER JOIN clause to the query using the Reservation relation
  *
  * @method DayQuery leftJoinDayInterval($relationAlias = null) Adds a LEFT JOIN clause to the query using the DayInterval relation
  * @method DayQuery rightJoinDayInterval($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DayInterval relation
@@ -298,6 +303,80 @@ abstract class BaseDayQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(DayPeer::VALUE, $value, $comparison);
+    }
+
+    /**
+     * Filter the query by a related Reservation object
+     *
+     * @param   Reservation|PropelObjectCollection $reservation  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 DayQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByReservation($reservation, $comparison = null)
+    {
+        if ($reservation instanceof Reservation) {
+            return $this
+                ->addUsingAlias(DayPeer::ID, $reservation->getDayId(), $comparison);
+        } elseif ($reservation instanceof PropelObjectCollection) {
+            return $this
+                ->useReservationQuery()
+                ->filterByPrimaryKeys($reservation->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByReservation() only accepts arguments of type Reservation or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Reservation relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return DayQuery The current query, for fluid interface
+     */
+    public function joinReservation($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Reservation');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Reservation');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Reservation relation Reservation object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \RMT\TimeScheduling\Model\ReservationQuery A secondary query class using the current class as primary query
+     */
+    public function useReservationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinReservation($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Reservation', '\RMT\TimeScheduling\Model\ReservationQuery');
     }
 
     /**

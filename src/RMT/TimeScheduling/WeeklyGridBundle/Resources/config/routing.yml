@@ -1,0 +1,3 @@
+rmt_time_scheduling_weekly_grid_homepage:
+    pattern:  /weekly-grid/{user_id}
+    defaults: { _controller: RMTTimeSchedulingWeeklyGridBundle:Default:index }

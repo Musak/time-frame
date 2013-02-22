@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database name="default" namespace="RMT\TimeScheduling\Model" defaultIdMethod="native">
+
+    <!-- add user as a foreign key constraint -->
+    <table name="reservation">
+    	<column name="id" type="integer" primaryKey="true" autoIncrement="true" />
+        <column name="client_user_id" type="integer" required="true" />
+        <foreign-key foreignTable="fos_user" phpName="Client">
+            <reference local="client_user_id" foreign="id" />
+        </foreign-key>
+        <column name="service_provider_user_id" type="integer" required="true" />
+        <foreign-key foreignTable="fos_user" phpName="ServiceProvider">
+            <reference local="service_provider_user_id" foreign="id" />
+        </foreign-key>
+    	<column name="day_id" type="integer" />
+    	<foreign-key foreignTable="day">
+    		<reference local="day_id" foreign="id" />
+    	</foreign-key>
+    	<column name="start_time" type="time" required="true" />
+    	<column name="end_time" type="time" required="true" />
+    </table>
+
+</database>

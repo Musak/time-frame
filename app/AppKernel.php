@@ -29,6 +29,8 @@ class AppKernel extends Kernel
             new RMT\TimeScheduling\WorkingHoursBundle\RMTTimeSchedulingWorkingHoursBundle(),
             new RMT\UserManagment\DashboardBundle\RMTUserManagmentDashboardBundle(),
             new RMT\SiteManagment\MenuBundle\RMTSiteManagmentMenuBundle(),
+            new RMT\TimeScheduling\ReservationsBundle\RMTTimeSchedulingReservationsBundle(),
+            new RMT\TimeScheduling\WeeklyGridBundle\RMTTimeSchedulingWeeklyGridBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

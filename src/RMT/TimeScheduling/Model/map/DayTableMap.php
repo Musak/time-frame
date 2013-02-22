@@ -52,6 +52,7 @@ class DayTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Reservation', 'RMT\\TimeScheduling\\Model\\Reservation', RelationMap::ONE_TO_MANY, array('id' => 'day_id', ), null, null, 'Reservations');
         $this->addRelation('DayInterval', 'RMT\\TimeScheduling\\Model\\DayInterval', RelationMap::ONE_TO_MANY, array('id' => 'day_id', ), null, null, 'DayIntervals');
     } // buildRelations()
 

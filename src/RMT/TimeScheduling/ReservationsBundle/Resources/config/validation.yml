@@ -1,0 +1,5 @@
+RMT\TimeScheduling\Model\Reservation:
+    constraints:
+        - Callback:
+            methods:
+                -    [RMT\TimeScheduling\ReservationValidator, isValidTime]
