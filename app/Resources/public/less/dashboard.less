@@ -1,0 +1,61 @@
+.rounded-corners (@radius: 6px) {
+    -webkit-border-radius: @radius;
+    -moz-border-radius: @radius;
+    -ms-border-radius: @radius;
+    -o-border-radius: @radius;
+    border-radius: @radius;
+}
+
+.box-shadow(@style, @c) when (iscolor(@c)) {
+  box-shadow:         @style @c;
+  -webkit-box-shadow: @style @c;
+  -moz-box-shadow:    @style @c;
+}
+
+.box-shadow(@style, @alpha: 50%) when (isnumber(@alpha)) {
+  .box-shadow(@style, rgba(0, 0, 0, @alpha));
+}
+
+
+.side-nav {
+    background-color: #ffffff;
+    .rounded-corners;
+    .box-shadow(0 1px 4px, 6.7%)
+}
+
+.nav-list { 
+    padding-left:0;
+    padding-right:0;
+    margin-bottom:0;
+}
+
+.side-nav li:first-child > a {
+    .rounded-corners(6px 6px 0 0);
+}
+
+.side-nav li:last-child > a {
+    .rounded-corners(0px 0px 6px 6px);
+}
+
+.side-nav li a {
+    border: 1px solid #E5E5E5;
+    display: block;
+    margin: 0 0 -1px;
+    padding: 8px 14px;
+}
+
+.side-nav li.current a {
+    background-color: #0088cc;
+    color:white;
+    position: relative;
+    z-index:2;
+    border: 0 none;
+}
+
+#dashboardContent {
+    border: 1px solid #E5E5E5;
+    background-color: #ffffff;
+    .rounded-corners;
+    .box-shadow(0 1px 4px, 6.7%);
+    padding: 10px 20px;
+}

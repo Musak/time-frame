@@ -21,6 +21,8 @@ class MenuBuilder
     public function createUserMenu()
     {
         $menu = $this->factory->createItem('root');
+        
+        $menu->setChildrenAttribute('class', 'nav nav-list side-nav');
         $this->event_dispatcher->dispatch(ConfigureMenuEvent::CONFIGURE_USER_MENU, 
                                           new ConfigureMenuEvent($this->factory, $menu));
        # $menu->addChild('test',array('route' => 'user_dashboard'));
