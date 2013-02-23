@@ -1,0 +1,13 @@
+<Fixtures>
+    <!-- Add one user -->
+    <User Namespace="FOS\UserBundle\Propel">
+        <o1 username="client"
+            username_canonical="client"
+            email="_r_symfony@russmedia.com"
+            email_canonical="_r_symfony@russmedia.com"
+            salt="7sxwzcdkthk4wcccgoswo4wkco04ogk"
+            password="sVBzgOjE9f2oFce6HM6GAxNF+cF51L/rTuUM9sckiGz4t8dklEo//wVbli6deBADOkd49Me/9kwqHoYPuGL3AQ=="  
+            enabled="1"
+        />
+    </User>
+</Fixtures>

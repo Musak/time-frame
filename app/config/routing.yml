@@ -1,7 +1,3 @@
-rmt_site_managment_menu:
-    resource: "@RMTSiteManagmentMenuBundle/Resources/config/routing.yml"
-    prefix:   /
-
 rmt_user_managment_dashboard:
     resource: "@RMTUserManagmentDashboardBundle/Resources/config/routing.yml"
 

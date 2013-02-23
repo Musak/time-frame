@@ -11,7 +11,7 @@ class DashboardController extends Controller
     {
         $has_interval = DayIntervalQuery::create()
                             ->filterByUser($this->getUser())
-                            ->count();
+                            ->exists();
         
         return $this->render('RMTUserManagmentDashboardBundle:Dashboard:index.html.twig', 
                             array('has_interval' => $has_interval));
