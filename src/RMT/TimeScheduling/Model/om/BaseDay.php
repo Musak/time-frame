@@ -1328,6 +1328,7 @@ abstract class BaseDay extends BaseObject implements Persistent
 
             if($partial && !$criteria) {
                 return count($this->getDayIntervals());
+            }
             $query = DayIntervalQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
