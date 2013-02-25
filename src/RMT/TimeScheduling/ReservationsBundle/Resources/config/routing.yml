@@ -7,3 +7,7 @@ rmt_time_scheduling_reservations:
 rmt_time_scheduling_reservation_add:
     pattern: /reservation/add/{service_provider_id}/{reservation_hour}/{day_name}
     defaults: { _controller: RMTTimeSchedulingReservationsBundle:Default:reserve }
+
+rmt_time_scheduling_reservation_cancel:
+    pattern: /reservation/cancel/{reservation_id}
+    defaults: { _controller: RMTTimeSchedulingReservationsBundle:Default:cancel }

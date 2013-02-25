@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use RMT\TimeScheduling\Model\Reservation; 
 use RMT\TimeScheduling\Model\DayQuery;
+use RMT\TimeScheduling\Model\ReservationQuery;
 use RMT\TimeScheduling\ReservationsBundle\Form\Type\ReservationType;
 
 class DefaultController extends Controller
@@ -29,8 +30,6 @@ class DefaultController extends Controller
         return $this->render('RMTTimeSchedulingReservationsBundle:Default:index.html.twig', array('form' => $form->createView()));
     }
 
-
-    // @todo missing day in save
     public function reserveAction($service_provider_id, $reservation_hour, $day_name) {
         $user = $this->getUser();
         $reservation = new Reservation();
@@ -49,4 +48,14 @@ class DefaultController extends Controller
         $referer = $this->getRequest()->headers->get('referer');  
         return new RedirectResponse($referer);
     }
+
+    public function cancelAction($reservation_id)
+    {
+        ReservationQuery::create()
+            ->findPK($reservation_id)
+            ->delete();
+        $referer = $this->getRequest()->headers->get('referer');  
+        return new RedirectResponse($referer);
+    }
+
 }

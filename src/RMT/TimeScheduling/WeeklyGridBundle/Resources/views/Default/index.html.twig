@@ -48,8 +48,15 @@
                                        class="btn btn-success">
                                        Reserve
                                     </a>
-                                {% else %}
-                                    <span style="background-color: #ff9999; display: block;">&nbsp;</span>
+                                {% else  %}
+                               		{% if my_reserved[i] is defined and my_reserved[i][j] is defined %}
+	                                    <a href="{{ path('rmt_time_scheduling_reservation_cancel', {'reservation_id': my_reserved[i][j]}) }}"
+                                       class="btn btn-danger">
+											Cancel
+	                                    </a>
+		                            {% else %}
+                                    	<span style="background-color: #ff9999; display: block;">&nbsp;</span>
+                                    {% endif %}
                                 {% endif %}
                             {% else %}
                                 <span style="background-color: #99ff99; display: block;">&nbsp;</span>
