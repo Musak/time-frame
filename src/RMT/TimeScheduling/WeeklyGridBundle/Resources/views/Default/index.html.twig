@@ -49,8 +49,8 @@
                                        Reserve
                                     </a>
                                 {% else  %}
-                               		{% if defined my_reserved[i] or j in my_reserved[i]%}
-	                                    <a href="{{ path('rmt_time_scheduling_reservation_add', {'service_provider_id': service_provider_id, 'reservation_hour': i, 'day_name': j}) }}"
+                               		{% if my_reserved[i] is defined and my_reserved[i][j] is defined %}
+	                                    <a href="{{ path('rmt_time_scheduling_reservation_cancel', {'reservation_id': my_reserved[i][j]}) }}"
                                        class="btn btn-danger">
 											Cancel
 	                                    </a>

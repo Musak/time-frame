@@ -35,9 +35,8 @@ class DefaultController extends Controller
             ->find();
         $my_reserved=array();
         foreach ($my_reservations as $my_reservation) {
-            $my_reserved[$my_reservation->getStartTime()->format('G')][] = $my_reservation->getDay()->getValue();
+            $my_reserved[$my_reservation->getStartTime()->format('G')][$my_reservation->getDay()->getValue()] = $my_reservation->getId(); 
         }
-
         $reserved = array();    
         $reservations = ReservationQuery::create()
             ->filterByServiceProvider($service_provider_user)
