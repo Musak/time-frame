@@ -2,6 +2,8 @@ parameters:
 #    rmt_time_scheduling_working_hours.example.class: RMT\TimeScheduling\WorkingHoursBundle\Example
 
 services:
-#    rmt_time_scheduling_working_hours.example:
-#        class: %rmt_time_scheduling_working_hours.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
+    working_hours.configure_menu_listener:
+        class: RMT\TimeScheduling\WorkingHoursBundle\Menu\ConfigureMenuListener
+        tags:
+          - { name: kernel.event_listener, event: menu.user_menu_configure, method: onMenuConfigure }
+
