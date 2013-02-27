@@ -40,3 +40,9 @@ sudo apt-get install nodejs npm
 npm install less
 ```
 
+After running those commands, if no file `/usr/bin/nodejs` exists, then create a symlink to `/usr/bin/node`
+
+```bash
+sudo ln -s /usr/bin/node /usr/bin/nodejs
+```
+
