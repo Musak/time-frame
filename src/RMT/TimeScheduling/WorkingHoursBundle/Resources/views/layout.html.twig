@@ -1,6 +1,6 @@
-{% extends 'MopaBootstrapBundle::layout.html.twig' %}
+{% extends ':Dashboard:layout.html.twig' %}
 
-{% block headline %}Working hours{% endblock %}
-{% block content %}
-  {% block working_hours %}{% endblock working_hours %}
-{% endblock content %}
+{% block headline %}Working hours{% endblock headline %}
+{% block dashboard_content %}
+    {% block working_hours %}{% endblock working_hours %}
+{% endblock dashboard_content %}
