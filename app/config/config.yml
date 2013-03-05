@@ -32,7 +32,7 @@ assetic:
     filters:
         less:
             node: /usr/bin/nodejs
-            node_paths: [%kernel.root_dir%/../node_modules]
+            node_paths: [%kernel.root_dir%/../node_modules, /opt/local/lib/node_modules]
             apply_to: "\.less$"
         cssrewrite: ~
         #closure:
